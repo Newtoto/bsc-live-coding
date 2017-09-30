@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+#include <vector>
+#include <fstream>
 
 #include <SDL.h>
 #include <GL\glew.h>
