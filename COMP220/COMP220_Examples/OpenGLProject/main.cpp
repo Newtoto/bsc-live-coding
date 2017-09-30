@@ -64,9 +64,9 @@ int main(int argc, char* args[])
 	//Array of 3 vectors which represents 3 vertices
 	static const GLfloat g_vertex_buffer_data[] =
 	{
-		-1.0f, -1.0f, 0.0f,
-		1.0f, -1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
+		-1.0f, -1.0f, 0.0f, //Bottom left
+		1.0f, -1.0f, 0.0f,	//Bottom right
+		0.0f, 1.0f, 0.0f,	//Top
 	};
 
 	//Identify vetex buffer
