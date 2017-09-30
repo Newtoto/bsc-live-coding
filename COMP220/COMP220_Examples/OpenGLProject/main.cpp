@@ -57,6 +57,27 @@ int main(int argc, char* args[])
 		return 1;
 	}
 
+	GLuint VertexArrayID;
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
+
+	//Array of 3 vectors which represents 3 vertices
+	static const GLfloat g_vertex_buffer_data[] =
+	{
+		-1.0f, -1.0f, 0.0f,
+		1.0f, -1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+	};
+
+	//Identify vetex buffer
+	GLuint vertexbuffer;
+	//Generate 1 buffer, put the resulting identifier in vertexbuffer
+	glGenBuffers(1, &vertexbuffer);
+	// Following commands talk about 'vertexbuffer' buffer
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	// Give vertices to OpenGL
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
 	//Event loop, we will loop until running is set to false, usually if escape has been pressed or window is closed
 	bool running = true;
 	//SDL Event structure, this will be checked in the while loop
@@ -90,9 +111,27 @@ int main(int argc, char* args[])
 		glClearColor(0.0, 1.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		//1st attribute buffer : vertices
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glVertexAttribPointer(
+			0,				//Attribute 0, no reason for 0, but must match layout in the shader
+			3,				//Size 
+			GL_FLOAT,		//Type
+			GL_FALSE,		//Normalized?
+			0,				//Stride
+			(void*)0		//Array buffer offset
+		);
+		//Draw the triangle
+		glDrawArrays(GL_TRIANGLES, 0, 3); //Starting from vertex 0; 3 vertices total -> 1 triangle
+		glDisableVertexAttribArray(0);
+
 		SDL_GL_SwapWindow(window);
 	}
 
+	glDeleteBuffers(1, &vertexbuffer);
+	glDeleteVertexArrays(1, &VertexArrayID);
+	//Delete content
 	SDL_GL_DeleteContext(glContext);
 	//Destroy the window and quit SDL2, NB we should do this after all cleanup in this order!!!
 	//https://wiki.libsdl.org/SDL_DestroyWindow
