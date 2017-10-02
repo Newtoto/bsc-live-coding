@@ -123,27 +123,20 @@ int main(int argc, char* args[])
 		return 1;
 	}
 
-	//Request 3.2 core OpenGL
+	//Request 3.1 core OpenGL
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
 	SDL_GLContext glContext = SDL_GL_CreateContext(window);
 	if (glContext == nullptr)
 	{
-		//Request 3.1 core OpenGL for laptop
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-		glContext = SDL_GL_CreateContext(window);
-		if (glContext == nullptr) {
 			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_CreateContent failed", SDL_GetError(), NULL);
 
 			SDL_DestroyWindow(window);
 			SDL_Quit();
 
 			return 1;
-		}
 	}
 
 	//Init GLEW
