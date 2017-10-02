@@ -1,4 +1,4 @@
-//main.cpp - defines the entry point of the application
+//main.cpp - define the entry point of the application
 
 #include "main.h"
 
@@ -131,12 +131,19 @@ int main(int argc, char* args[])
 	SDL_GLContext glContext = SDL_GL_CreateContext(window);
 	if (glContext == nullptr)
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_CreateContent failed", SDL_GetError(), NULL);
+		//Request 3.1 core OpenGL for laptop
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+		glContext = SDL_GL_CreateContext(window);
+		if (glContext == nullptr) {
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_CreateContent failed", SDL_GetError(), NULL);
 
-		SDL_DestroyWindow(window);
-		SDL_Quit();
+			SDL_DestroyWindow(window);
+			SDL_Quit();
 
-		return 1;
+			return 1;
+		}
 	}
 
 	//Init GLEW
@@ -157,7 +164,7 @@ int main(int argc, char* args[])
 	glBindVertexArray(VertexArrayID);
 
 	//Create and compile GLSL program from shaders
-	GLuint programID = LoadShaders("vert.glsl", "frag.glsl");
+	GLint programID = LoadShaders("vert.glsl", "frag.glsl");
 
 	//Array of 3 vectors which represents 3 vertices
 	static const GLfloat g_vertex_buffer_data[] =
@@ -220,6 +227,7 @@ int main(int argc, char* args[])
 			0,				//Stride
 			(void*)0		//Array buffer offset
 		);
+		glUseProgram(programID);
 		//Draw the triangle
 		glDrawArrays(GL_TRIANGLES, 0, 3); //Starting from vertex 0; 3 vertices total -> 1 triangle
 		glDisableVertexAttribArray(0);
