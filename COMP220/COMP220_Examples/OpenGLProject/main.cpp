@@ -156,6 +156,9 @@ int main(int argc, char* args[])
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
+	//Create and compile GLSL program from shaders
+	GLuint programID = LoadShaders("vert.glsl", "frag.glsl");
+
 	//Array of 3 vectors which represents 3 vertices
 	static const GLfloat g_vertex_buffer_data[] =
 	{
@@ -224,6 +227,7 @@ int main(int argc, char* args[])
 		SDL_GL_SwapWindow(window);
 	}
 
+	glDeleteProgram(programID);
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteVertexArrays(1, &VertexArrayID);
 	//Delete content

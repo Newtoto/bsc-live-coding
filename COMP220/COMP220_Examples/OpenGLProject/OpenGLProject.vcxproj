@@ -135,6 +135,10 @@ copy ..\..\..\Libraries\glew-2.1.0\bin\Release\x64\glew32.dll $(OutDir)\glew32.d
   <ItemGroup>
     <ClInclude Include="main.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="frag.glsl" />
+    <None Include="vert.glsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
