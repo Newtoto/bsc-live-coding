@@ -127,6 +127,7 @@ int main(int argc, char* args[])
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	SDL_GLContext glContext = SDL_GL_CreateContext(window);
 	if (glContext == nullptr)
@@ -184,8 +185,7 @@ int main(int argc, char* args[])
 
 	mat4 modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 
-
-	vec3 cameraPosition = vec3(0.0f, 0.0f, 10.0f);
+	vec3 cameraPosition = vec3(0.0f, 0.0f, -10.0f);
 	vec3 cameraTarget = vec3(0.0f, 0.0f, 0.0f);
 	vec3 cameraUp = vec3(0.0f, 1.0f, 0.0f);
 
@@ -193,17 +193,16 @@ int main(int argc, char* args[])
 
 	mat4 projectionMatrix = perspective(radians(90.0f), float(4 / 3), 0.1f, 100.0f);
 
-
 	//Create and compile GLSL program from shaders
 	GLuint programID = LoadShaders("vert.glsl", "frag.glsl");
-
-	static const GLfloat fragColor[] = { 0.0f, 1.0f, 0.0f, 1.0f };
 
 	GLint fragColorLocation = glGetUniformLocation(programID, "fragColor");
 	if (fragColorLocation < 0) 
 	{
 		printf("Unable to find %s uniform", "fragColor");
 	}
+
+	static const GLfloat fragColor[] = { 0.0f, 1.0f, 0.0f, 1.0f };
 
 	GLint currentTimeLocation = glGetUniformLocation(programID, "time");
 	if (currentTimeLocation < 0)
@@ -266,7 +265,7 @@ int main(int argc, char* args[])
 		currentTicks = SDL_GetTicks();
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
 
-		glClearColor(0.0, 1.0, 0.0, 1.0);
+		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(programID);
@@ -294,6 +293,8 @@ int main(int argc, char* args[])
 		glDisableVertexAttribArray(0);
 
 		SDL_GL_SwapWindow(window);
+
+		lastTicks = currentTicks;
 	}
 
 	glDeleteProgram(programID);
