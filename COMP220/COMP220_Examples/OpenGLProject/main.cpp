@@ -174,21 +174,36 @@ int main(int argc, char* args[])
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
 
-	vec3 trianglePosition = vec3(0.5f, 0.5f, 0.0f);
+	vec3 trianglePosition = vec3(0.0f, 0.0f, 0.0f);
+	vec3 triangleScale = vec3(1.0f, 1.0f, 1.0f);
+	vec3 triangleRotation = vec3(0.0f, 0.0f, 0.0f);
 
-	mat4 modelMatrix = translate(trianglePosition);
+	mat4 rotationMatrix = rotate(triangleRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(triangleRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(triangleRotation.z, vec3(1.0f, 0.0f, 1.0f));
+	mat4 scaleMatrix = scale(triangleScale);
+	mat4 translationMatrix = translate(trianglePosition);
+
+	mat4 modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
+
+
+	vec3 cameraPosition = vec3(0.0f, 0.0f, 10.0f);
+	vec3 cameraTarget = vec3(0.0f, 0.0f, 0.0f);
+	vec3 cameraUp = vec3(0.0f, 1.0f, 0.0f);
+
+	mat4 viewMatrix = lookAt(cameraPosition, cameraTarget, cameraUp);
+
+	mat4 projectionMatrix = perspective(radians(90.0f), float(4 / 3), 0.1f, 100.0f);
 
 
 	//Create and compile GLSL program from shaders
 	GLuint programID = LoadShaders("vert.glsl", "frag.glsl");
+
+	static const GLfloat fragColor[] = { 0.0f, 1.0f, 0.0f, 1.0f };
 
 	GLint fragColorLocation = glGetUniformLocation(programID, "fragColor");
 	if (fragColorLocation < 0) 
 	{
 		printf("Unable to find %s uniform", "fragColor");
 	}
-
-	static const GLfloat fragColor[] = { 0.0f, 1.0f, 0.0f, 1.0f };
 
 	GLint currentTimeLocation = glGetUniformLocation(programID, "time");
 	if (currentTimeLocation < 0)
@@ -201,6 +216,19 @@ int main(int argc, char* args[])
 	{
 		printf("Unable to find %s uniform", "modelMatrix");
 	}
+
+	GLint viewMatrixLocation = glGetUniformLocation(programID, "viewMatrix");
+	if (viewMatrixLocation < 0)
+	{
+		printf("Unable to find %s uniform", "viewMatrix");
+	}
+
+	GLint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
+	if (projectionMatrixLocation < 0)
+	{
+		printf("Unable to find %s uniform", "projectionMatrix");
+	}
+
 	int lastTicks = SDL_GetTicks();
 	int currentTicks = SDL_GetTicks();
 
@@ -246,6 +274,8 @@ int main(int argc, char* args[])
 		glUniform4fv(fragColorLocation, 1, fragColor);
 		glUniform1f(currentTimeLocation, (float)(currentTicks) / 1000.0f);
 		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(modelMatrix));
+		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(viewMatrix));
+		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(projectionMatrix));
 
 		//1st attribute buffer : vertices
 		glEnableVertexAttribArray(0);
