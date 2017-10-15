@@ -156,15 +156,12 @@ int main(int argc, char* args[])
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	//Create and compile GLSL program from shaders
-	GLint programID = LoadShaders("vert.glsl", "frag.glsl");
-
 	//Array of 3 vectors which represents 3 vertices
 	static const GLfloat g_vertex_buffer_data[] =
 	{
-		-1.0f, -1.0f, 0.0f, //Bottom left
-		1.0f, -1.0f, 0.0f,	//Bottom right
-		0.0f, 1.0f, 0.0f,	//Top
+		-0.5f, -0.5f, 0.0f, //Bottom left
+		0.5f, -0.5f, 0.0f,	//Bottom right
+		0.0f, 0.5f, 0.0f,	//Top
 	};
 
 	//Identify vetex buffer
@@ -175,6 +172,38 @@ int main(int argc, char* args[])
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	// Give vertices to OpenGL
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+
+	vec3 trianglePosition = vec3(0.5f, 0.5f, 0.0f);
+
+	mat4 modelMatrix = translate(trianglePosition);
+
+
+	//Create and compile GLSL program from shaders
+	GLuint programID = LoadShaders("vert.glsl", "frag.glsl");
+
+	GLint fragColorLocation = glGetUniformLocation(programID, "fragColor");
+	if (fragColorLocation < 0) 
+	{
+		printf("Unable to find %s uniform", "fragColor");
+	}
+
+	static const GLfloat fragColor[] = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+	GLint currentTimeLocation = glGetUniformLocation(programID, "time");
+	if (currentTimeLocation < 0)
+	{
+		printf("Unable to find %s uniform", "time");
+	}
+
+	GLint modelMatrixLocation = glGetUniformLocation(programID, "modelMatrix");
+	if (modelMatrixLocation < 0)
+	{
+		printf("Unable to find %s uniform", "modelMatrix");
+	}
+	int lastTicks = SDL_GetTicks();
+	int currentTicks = SDL_GetTicks();
+
 
 	//Event loop, we will loop until running is set to false, usually if escape has been pressed or window is closed
 	bool running = true;
@@ -206,8 +235,17 @@ int main(int argc, char* args[])
 			}
 		}
 
+		currentTicks = SDL_GetTicks();
+		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
+
 		glClearColor(0.0, 1.0, 0.0, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+		glUseProgram(programID);
+
+		glUniform4fv(fragColorLocation, 1, fragColor);
+		glUniform1f(currentTimeLocation, (float)(currentTicks) / 1000.0f);
+		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(modelMatrix));
 
 		//1st attribute buffer : vertices
 		glEnableVertexAttribArray(0);
@@ -220,7 +258,7 @@ int main(int argc, char* args[])
 			0,				//Stride
 			(void*)0		//Array buffer offset
 		);
-		glUseProgram(programID);
+		
 		//Draw the triangle
 		glDrawArrays(GL_TRIANGLES, 0, 3); //Starting from vertex 0; 3 vertices total -> 1 triangle
 		glDisableVertexAttribArray(0);

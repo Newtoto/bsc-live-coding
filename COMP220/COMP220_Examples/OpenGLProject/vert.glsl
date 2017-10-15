@@ -2,8 +2,12 @@
 
 layout (location = 0) in vec3 vertexPosition;
 
+uniform float time = 0.0f;
+
+uniform mat4 modelMatrix = mat4(1.0f);
+
 void main(){
-	//gl_Position = vec4(vertexPosition, 1.0);
-	gl_Position.xyz = vertexPosition;
-	gl_Position.w = 1;
+	vec4 modelVertexPosition = modelMatrix*vec4(vertexPosition, 1.0f);
+
+	gl_Position = modelVertexPosition;
 }
