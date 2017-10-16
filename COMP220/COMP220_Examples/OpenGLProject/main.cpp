@@ -111,7 +111,7 @@ int main(int argc, char* args[])
 
 	//Create a window, note we have to free the pointer returned using the DestroyWindow Function
 	//https://wiki.libsdl.org/SDL_CreateWindow
-	SDL_Window* window = SDL_CreateWindow("SDL2 Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_SHOWN|SDL_WINDOW_OPENGL);
+	SDL_Window* window = SDL_CreateWindow("SDL2 Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 800, SDL_WINDOW_SHOWN|SDL_WINDOW_OPENGL);
 	//Checks to see if the window has been created, the pointer will have a value of some kind
 	if (window == nullptr)
 	{
@@ -160,9 +160,53 @@ int main(int argc, char* args[])
 	//Array of 3 vectors which represents 3 vertices
 	static const GLfloat g_vertex_buffer_data[] =
 	{
-		-0.5f, -0.5f, 0.0f, //Bottom left
-		0.5f, -0.5f, 0.0f,	//Bottom right
-		0.0f, 0.5f, 0.0f,	//Top
+		//Front
+		-0.5, 0.5, 0.5,		//A
+		0.5, 0.5, 0.5,		//B
+		-0.5, -0.5, 0.5,	//C
+		0.5, 0.5, 0.5,		//B
+		-0.5, -0.5, 0.5,	//C
+		0.5, -0.5, 0.5,		//D
+
+		//Back
+		-0.5, 0.5, -0.5,	//E
+		0.5, 0.5, -0.5,		//F
+		-0.5, -0.5, -0.5,	//G
+		0.5, 0.5, -0.5,		//F
+		-0.5, -0.5, -0.5,	//G
+		0.5, -0.5, -0.5,	//
+
+		//Left
+		-0.5, 0.5, 0.5,		//A
+		-0.5, 0.5, -0.5,	//E
+		-0.5, -0.5, -0.5,	//G
+		-0.5, 0.5, 0.5,		//A
+		-0.5, -0.5, -0.5,	//G
+		-0.5, -0.5, 0.5,	//C
+
+		//Right
+		0.5, -0.5, 0.5,		//D
+		0.5, 0.5, 0.5,		//B
+		0.5, 0.5, -0.5,		//F
+		0.5, 0.5, -0.5,		//F
+		0.5, -0.5, 0.5,		//D
+		0.5, -0.5, -0.5,	//H
+
+		//Bottom
+		-0.5, -0.5, -0.5,	//G
+		0.5, -0.5, -0.5,	//H
+		-0.5, -0.5, 0.5,	//C
+		-0.5, -0.5, 0.5,	//C
+		0.5, -0.5, 0.5,		//D
+		0.5, -0.5, -0.5,	//H
+
+		//Top
+		-0.5, 0.5, -0.5,	//E
+		0.5, 0.5, -0.5,		//F
+		0.5, 0.5, 0.5,		//B
+		-0.5, 0.5, 0.5,		//A
+		0.5, 0.5, 0.5,		//B
+		-0.5, 0.5, -0.5		//E
 	};
 
 	//Identify vetex buffer
@@ -177,7 +221,7 @@ int main(int argc, char* args[])
 
 	vec3 trianglePosition = vec3(0.0f, 0.0f, 0.0f);
 	vec3 triangleScale = vec3(1.0f, 1.0f, 1.0f);
-	vec3 triangleRotation = vec3(0.0f, 0.0f, 0.0f);
+	vec3 triangleRotation = vec3(0.0f, 5.0f, 5.0f);
 
 	mat4 rotationMatrix = rotate(triangleRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(triangleRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(triangleRotation.z, vec3(1.0f, 0.0f, 1.0f));
 	mat4 scaleMatrix = scale(triangleScale);
@@ -185,7 +229,7 @@ int main(int argc, char* args[])
 
 	mat4 modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 
-	vec3 cameraPosition = vec3(0.0f, 0.0f, -10.0f);
+	vec3 cameraPosition = vec3(0.0f, 0.0f, -5.0f);
 	vec3 cameraTarget = vec3(0.0f, 0.0f, 0.0f);
 	vec3 cameraUp = vec3(0.0f, 1.0f, 0.0f);
 
@@ -258,9 +302,19 @@ int main(int argc, char* args[])
 				case SDLK_ESCAPE:
 					running = false;
 					break;
-				}
+				};
+				{
+					//Right Key
+				case SDLK_RIGHT:
+					triangleRotation.y += 0.1;
+					break;
+				};
 			}
 		}
+
+		//Recalculate translations
+		rotationMatrix = rotate(triangleRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(triangleRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(triangleRotation.z, vec3(1.0f, 0.0f, 1.0f));
+		modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 
 		currentTicks = SDL_GetTicks();
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
@@ -289,7 +343,7 @@ int main(int argc, char* args[])
 		);
 		
 		//Draw the triangle
-		glDrawArrays(GL_TRIANGLES, 0, 3); //Starting from vertex 0; 3 vertices total -> 1 triangle
+		glDrawArrays(GL_TRIANGLES, 0, sizeof(g_vertex_buffer_data)); //Starting from vertex 0;
 		glDisableVertexAttribArray(0);
 
 		SDL_GL_SwapWindow(window);
