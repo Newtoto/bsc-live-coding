@@ -157,71 +157,92 @@ int main(int argc, char* args[])
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	//Array of 3 vectors which represents 3 vertices
-	static const GLfloat g_vertex_buffer_data[] =
+	////Array of 3 vectors which represents 3 vertices
+	//static const GLfloat g_vertex_buffer_data[] =
+	//{
+	//	//Front
+	//	-0.5, 0.5, 0.5,		//A
+	//	0.5, 0.5, 0.5,		//B
+	//	-0.5, -0.5, 0.5,	//C
+	//	0.5, 0.5, 0.5,		//B
+	//	-0.5, -0.5, 0.5,	//C
+	//	0.5, -0.5, 0.5,		//D
+
+	//	//Back
+	//	-0.5, 0.5, -0.5,	//E
+	//	0.5, 0.5, -0.5,		//F
+	//	-0.5, -0.5, -0.5,	//G
+	//	0.5, 0.5, -0.5,		//F
+	//	-0.5, -0.5, -0.5,	//G
+	//	0.5, -0.5, -0.5,	//
+
+	//	//Left
+	//	-0.5, 0.5, 0.5,		//A
+	//	-0.5, 0.5, -0.5,	//E
+	//	-0.5, -0.5, -0.5,	//G
+	//	-0.5, 0.5, 0.5,		//A
+	//	-0.5, -0.5, -0.5,	//G
+	//	-0.5, -0.5, 0.5,	//C
+
+	//	//Right
+	//	0.5, -0.5, 0.5,		//D
+	//	0.5, 0.5, 0.5,		//B
+	//	0.5, 0.5, -0.5,		//F
+	//	0.5, 0.5, -0.5,		//F
+	//	0.5, -0.5, 0.5,		//D
+	//	0.5, -0.5, -0.5,	//H
+
+	//	//Bottom
+	//	-0.5, -0.5, -0.5,	//G
+	//	0.5, -0.5, -0.5,	//H
+	//	-0.5, -0.5, 0.5,	//C
+	//	-0.5, -0.5, 0.5,	//C
+	//	0.5, -0.5, 0.5,		//D
+	//	0.5, -0.5, -0.5,	//H
+
+	//	//Top
+	//	-0.5, 0.5, -0.5,	//E
+	//	0.5, 0.5, -0.5,		//F
+	//	0.5, 0.5, 0.5,		//B
+	//	-0.5, 0.5, 0.5,		//A
+	//	0.5, 0.5, 0.5,		//B
+	//	-0.5, 0.5, -0.5		//E
+	//};
+
+	Vertex triangleVertices[] = {
+		{ -1.0f,1.0f,0.0f,0.0f,0.0f,1.0f,1.0f }, // Top Left
+		{ 1.0f,1.0f,0.0f,0.0f,0.0f,1.0f,1.0f }, // Top Right
+		{ -1.0f,-1.0f,0.0f,1.0f,0.0f,0.0f,1.0f}, // Bottom Left
+		{ 1.0f,-1.0f,0.0f,0.0f,1.0f,0.0f,1.0f}, // Bottom Right
+		//{ -1.0f,1.0f,-1.0f,0.0f,0.0f,1.0f,1.0f}, // Top Left Forward
+	};
+
+	unsigned int triangleIndices[] = 
 	{
-		//Front
-		-0.5, 0.5, 0.5,		//A
-		0.5, 0.5, 0.5,		//B
-		-0.5, -0.5, 0.5,	//C
-		0.5, 0.5, 0.5,		//B
-		-0.5, -0.5, 0.5,	//C
-		0.5, -0.5, 0.5,		//D
-
-		//Back
-		-0.5, 0.5, -0.5,	//E
-		0.5, 0.5, -0.5,		//F
-		-0.5, -0.5, -0.5,	//G
-		0.5, 0.5, -0.5,		//F
-		-0.5, -0.5, -0.5,	//G
-		0.5, -0.5, -0.5,	//
-
-		//Left
-		-0.5, 0.5, 0.5,		//A
-		-0.5, 0.5, -0.5,	//E
-		-0.5, -0.5, -0.5,	//G
-		-0.5, 0.5, 0.5,		//A
-		-0.5, -0.5, -0.5,	//G
-		-0.5, -0.5, 0.5,	//C
-
-		//Right
-		0.5, -0.5, 0.5,		//D
-		0.5, 0.5, 0.5,		//B
-		0.5, 0.5, -0.5,		//F
-		0.5, 0.5, -0.5,		//F
-		0.5, -0.5, 0.5,		//D
-		0.5, -0.5, -0.5,	//H
-
-		//Bottom
-		-0.5, -0.5, -0.5,	//G
-		0.5, -0.5, -0.5,	//H
-		-0.5, -0.5, 0.5,	//C
-		-0.5, -0.5, 0.5,	//C
-		0.5, -0.5, 0.5,		//D
-		0.5, -0.5, -0.5,	//H
-
-		//Top
-		-0.5, 0.5, -0.5,	//E
-		0.5, 0.5, -0.5,		//F
-		0.5, 0.5, 0.5,		//B
-		-0.5, 0.5, 0.5,		//A
-		0.5, 0.5, 0.5,		//B
-		-0.5, 0.5, -0.5		//E
+		0, 1, 2,
+		1, 2, 3,
+		0, 5, 2
 	};
 
 	//Identify vetex buffer
-	GLuint vertexbuffer;
-	//Generate 1 buffer, put the resulting identifier in vertexbuffer
-	glGenBuffers(1, &vertexbuffer);
-	// Following commands talk about 'vertexbuffer' buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	GLuint vertexBuffer;
+	//Generate 1 buffer, put the resulting identifier in vertexBuffer
+	glGenBuffers(1, &vertexBuffer);
+	// Following commands talk about 'vertexBuffer' buffer
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	// Give vertices to OpenGL
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 5 * sizeof(Vertex), triangleVertices, GL_STATIC_DRAW);
+
+	//Identify element buffer
+	GLuint elementBuffer;
+	glGenBuffers(1, &elementBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 9 * sizeof(unsigned int), triangleIndices, GL_STATIC_DRAW);
 
 
 	vec3 trianglePosition = vec3(0.0f, 0.0f, 0.0f);
 	vec3 triangleScale = vec3(1.0f, 1.0f, 1.0f);
-	vec3 triangleRotation = vec3(0.0f, 5.0f, 5.0f);
+	vec3 triangleRotation = vec3(0.0f, 0.0f, 0.0f);
 
 	mat4 rotationMatrix = rotate(triangleRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(triangleRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(triangleRotation.z, vec3(1.0f, 0.0f, 1.0f));
 	mat4 scaleMatrix = scale(triangleScale);
@@ -330,29 +351,33 @@ int main(int argc, char* args[])
 		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(viewMatrix));
 		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(projectionMatrix));
 
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
+		
 		//1st attribute buffer : vertices
 		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glVertexAttribPointer(
-			0,				//Attribute 0, no reason for 0, but must match layout in the shader
-			3,				//Size 
-			GL_FLOAT,		//Type
-			GL_FALSE,		//Normalized?
-			0,				//Stride
-			(void*)0		//Array buffer offset
+			0,					//Attribute 0, no reason for 0, but must match layout in the shader
+			3,					//Size 
+			GL_FLOAT,			//Type
+			GL_FALSE,			//Normalized?
+			sizeof(Vertex),		//Stride
+			(void*)0			//Array buffer offset
 		);
-		
-		//Draw the triangle
-		glDrawArrays(GL_TRIANGLES, 0, sizeof(g_vertex_buffer_data)); //Starting from vertex 0;
-		glDisableVertexAttribArray(0);
 
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
+
+		//Draw the triangle
+		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, (void*)0);
 		SDL_GL_SwapWindow(window);
 
 		lastTicks = currentTicks;
 	}
 
 	glDeleteProgram(programID);
-	glDeleteBuffers(1, &vertexbuffer);
+	glDeleteBuffers(1, &vertexBuffer);
+	glDeleteBuffers(1, &elementBuffer);
 	glDeleteVertexArrays(1, &VertexArrayID);
 	//Delete content
 	SDL_GL_DeleteContext(glContext);

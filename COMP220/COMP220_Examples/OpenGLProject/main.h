@@ -12,4 +12,6 @@
 #include <glm\gtx\transform.hpp>
 #include <glm\gtc\type_ptr.hpp>
 
+#include "Vertex.h"
+
 using namespace glm;
