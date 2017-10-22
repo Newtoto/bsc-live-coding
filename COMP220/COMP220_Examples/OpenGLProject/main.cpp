@@ -161,10 +161,10 @@ int main(int argc, char* args[])
 	//static const GLfloat g_vertex_buffer_data[] =
 	//{
 	//	//Front
-	//	-0.5, 0.5, 0.5,		//A
-	//	0.5, 0.5, 0.5,		//B
+	//	-0.5, 0.5, 0.5,		//0
+	//	0.5, 0.5, 0.5,		//1
 	//	-0.5, -0.5, 0.5,	//C
-	//	0.5, 0.5, 0.5,		//B
+	//	0.5, 0.5, 0.5,		//1
 	//	-0.5, -0.5, 0.5,	//C
 	//	0.5, -0.5, 0.5,		//D
 
@@ -174,10 +174,10 @@ int main(int argc, char* args[])
 	//	-0.5, -0.5, -0.5,	//G
 	//	0.5, 0.5, -0.5,		//F
 	//	-0.5, -0.5, -0.5,	//G
-	//	0.5, -0.5, -0.5,	//
+	//	0.5, -0.5, -0.5,	//H
 
 	//	//Left
-	//	-0.5, 0.5, 0.5,		//A
+	//	-0.5, 0.5, 0.5,		//0
 	//	-0.5, 0.5, -0.5,	//E
 	//	-0.5, -0.5, -0.5,	//G
 	//	-0.5, 0.5, 0.5,		//A
@@ -204,24 +204,44 @@ int main(int argc, char* args[])
 	//	-0.5, 0.5, -0.5,	//E
 	//	0.5, 0.5, -0.5,		//F
 	//	0.5, 0.5, 0.5,		//B
-	//	-0.5, 0.5, 0.5,		//A
+	//	-0.5, 0.5, 0.5,		//0
 	//	0.5, 0.5, 0.5,		//B
 	//	-0.5, 0.5, -0.5		//E
 	//};
 
 	Vertex triangleVertices[] = {
-		{ -1.0f,1.0f,0.0f,0.0f,0.0f,1.0f,1.0f }, // Top Left
-		{ 1.0f,1.0f,0.0f,0.0f,0.0f,1.0f,1.0f }, // Top Right
-		{ -1.0f,-1.0f,0.0f,1.0f,0.0f,0.0f,1.0f}, // Bottom Left
-		{ 1.0f,-1.0f,0.0f,0.0f,1.0f,0.0f,1.0f}, // Bottom Right
-		//{ -1.0f,1.0f,-1.0f,0.0f,0.0f,1.0f,1.0f}, // Top Left Forward
+		{ -0.5, 0.5, 0.5, 1.0f, 0.0f, 0.0f, 1.0f},		//A 0
+		{ 0.5, 0.5, 0.5, 0.0f, 1.0f, 0.0f, 1.0f },		//B 1
+		{ -0.5, -0.5, 0.5, 0.0f, 0.0f, 1.0f, 1.0f },	//C 2
+		{ 0.5, -0.5, 0.5, 1.0f, 1.0f, 0.0f, 1.0f },		//D 3
+		{ -0.5, 0.5, -0.5, 0.0f, 1.0f, 1.0f, 1.0f },	//E 4
+		{ 0.5, 0.5, -0.5, 1.0f, 0.0f, 1.0f, 1.0f },		//F 5
+		{ -0.5, -0.5, -0.5, 1.0f, 1.0f, 1.0f, 1.0f },	//G 6
+		{ 0.5, -0.5, -0.5, 0.0f, 0.0f, 0.0f, 1.0f },	//H 7
+
 	};
 
 	unsigned int triangleIndices[] = 
 	{
+		//Front
 		0, 1, 2,
 		1, 2, 3,
-		0, 5, 2
+		//Back
+		4, 5, 6,
+		5, 6, 7,
+		//Left
+		0, 4, 6,
+		0, 6, 2,
+		//Right
+		3, 1, 5,
+		5, 3, 7,
+		//Bottom
+		6, 7, 2,
+		2, 3, 7,
+		//Top
+		4, 5, 1,
+		0, 1, 4
+
 	};
 
 	//Identify vetex buffer
@@ -231,13 +251,13 @@ int main(int argc, char* args[])
 	// Following commands talk about 'vertexBuffer' buffer
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	// Give vertices to OpenGL
-	glBufferData(GL_ARRAY_BUFFER, 5 * sizeof(Vertex), triangleVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(Vertex), triangleVertices, GL_STATIC_DRAW);
 
 	//Identify element buffer
 	GLuint elementBuffer;
 	glGenBuffers(1, &elementBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 9 * sizeof(unsigned int), triangleIndices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned int), triangleIndices, GL_STATIC_DRAW);
 
 
 	vec3 trianglePosition = vec3(0.0f, 0.0f, 0.0f);
@@ -369,7 +389,7 @@ int main(int argc, char* args[])
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
 
 		//Draw the triangle
-		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, (void*)0);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)0);
 		SDL_GL_SwapWindow(window);
 
 		lastTicks = currentTicks;
