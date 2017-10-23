@@ -343,15 +343,28 @@ int main(int argc, char* args[])
 				case SDLK_ESCAPE:
 					running = false;
 					break;
-				};
-				{
-					//Right Key
+
+				case SDLK_UP:
+					cameraPosition.z += 0.1;
+					break;
+
+				case SDLK_DOWN:
+					cameraPosition.z -= 0.1;
+					break;
+
 				case SDLK_RIGHT:
-					triangleRotation.y += 0.1;
+					cameraTarget.x -= 0.1;
+					break;
+
+				case SDLK_LEFT:
+					cameraTarget.x += 0.1;
 					break;
 				};
 			}
 		}
+
+		//Recalculate camera
+		viewMatrix = lookAt(cameraPosition, cameraTarget, cameraUp);
 
 		//Recalculate translations
 		rotationMatrix = rotate(triangleRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(triangleRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(triangleRotation.z, vec3(1.0f, 0.0f, 1.0f));
