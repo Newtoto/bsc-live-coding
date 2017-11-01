@@ -68,80 +68,9 @@ int main(int argc, char* args[])
 		return 1;
 	}
 
-	GLuint VertexArrayID;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
-
-	/*Vertex triangleVertices[] =
-	{
-		{ -0.5f,-0.5f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f },
-		{ 0.5f,-0.5f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,0.0f },
-		{ 0.5f,0.5f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f },
-		{ -0.5f,0.5f,0.0f,0.0f,0.0f,1.0f,1.0f ,0.0f,1.0f }
-	};
-
-	unsigned int triangleIndices[] =
-	{
-		0,1,2,
-		2,0,3
-	};*/
-	
-	
-	// Cube vertices
-	Vertex triangleVertices[] = {
-		{ -0.5, 0.5, 0.5, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },		//A 0
-		{ 0.5, 0.5, 0.5, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f },		//B 1
-		{ -0.5, -0.5, 0.5, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f },	//C 2
-		{ 0.5, -0.5, 0.5, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f },		//D 3
-		{ -0.5, 0.5, -0.5, 0.0f, 1.0f, 1.0f, 1.0f , 0.0f, 0.0f },	//E 4
-		{ 0.5, 0.5, -0.5, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f },		//F 5
-		{ -0.5, -0.5, -0.5, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },	//G 6
-		{ 0.5, -0.5, -0.5, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f },	//H 7
-
-	};
-
-	unsigned int triangleIndices[] = 
-	{
-		//Front
-		0, 1, 2,
-		1, 2, 3,
-		//Back
-		4, 5, 6,
-		5, 6, 7,
-		//Left
-		0, 4, 6,
-		0, 6, 2,
-		//Right
-		3, 1, 5,
-		5, 3, 7,
-		//Bottom
-		6, 7, 2,
-		2, 3, 7,
-		//Top
-		4, 5, 1,
-		0, 1, 4
-
-	};
-
-
-
-	//Identify vetex buffer
-	GLuint vertexBuffer;
-	//Generate 1 buffer, put the resulting identifier in vertexBuffer
-	glGenBuffers(1, &vertexBuffer);
-	// Following commands talk about 'vertexBuffer' buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	// Give vertices to OpenGL
-	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(Vertex), triangleVertices, GL_STATIC_DRAW);
-
-	//Identify element buffer
-	GLuint elementBuffer;
-	glGenBuffers(1, &elementBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned int), triangleIndices, GL_STATIC_DRAW);
-
-	GLuint textureID = loadTextureFromFile("Crate.jpg");
-
+	std::vector<Mesh*> meshes;
+	loadMeshesFromFile("Tank1.FBX", meshes);
+	GLuint textureID = loadTextureFromFile("Tank1DF.png");
 
 	vec3 trianglePosition = vec3(0.0f, 0.0f, 0.0f);
 	vec3 triangleScale = vec3(1.0f, 1.0f, 1.0f);
@@ -202,6 +131,7 @@ int main(int argc, char* args[])
 		printf("Unable to find %s uniform", "baseTexture");
 	}
 
+	glEnable(GL_DEPTH_TEST);
 	int lastTicks = SDL_GetTicks();
 	int currentTicks = SDL_GetTicks();
 
@@ -263,15 +193,14 @@ int main(int argc, char* args[])
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
 
 		glClearColor(0.0, 0.0, 0.0, 1.0);
+		glClearDepth(1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textureID);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
-
 		glUseProgram(programID);
+
 		glUniform4fv(fragColorLocation, 1, fragColor);
 		glUniform1f(currentTimeLocation, (float)(currentTicks) / 1000.0f);
 		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(modelMatrix));
@@ -279,36 +208,38 @@ int main(int argc, char* args[])
 		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(projectionMatrix));
 		glUniform1i(textureLocation, 0);
 		
-		//1st attribute buffer : vertices
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(
-			0,					//Attribute 0, no reason for 0, but must match layout in the shader
-			3,					//Size 
-			GL_FLOAT,			//Type
-			GL_FALSE,			//Normalized?
-			sizeof(Vertex),		//Stride
-			(void*)0			//Array buffer offset
-		);
-
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
-
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(7 * sizeof(float)));
 
 		//Draw the triangle
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)0);
+		for (Mesh * currentMesh : meshes)
+		{
+			currentMesh->render();
+		}
+
 		SDL_GL_SwapWindow(window);
 
 		lastTicks = currentTicks;
 	}
 
 	//Delete content
-	glDeleteProgram(programID);
-	glDeleteBuffers(1, &vertexBuffer);
-	glDeleteBuffers(1, &elementBuffer);
+	auto iter = meshes.begin();
+	while (iter != meshes.end())
+	{
+		if ((*iter))
+		{
+			(*iter)->destroy();
+			delete (*iter);
+			iter = meshes.erase(iter);
+		}
+		else
+		{
+			iter++;
+		}
+	}
+	meshes.clear();
+
 	glDeleteTextures(1, &textureID);
-	glDeleteVertexArrays(1, &VertexArrayID);
+	glDeleteProgram(programID);
+
 	SDL_GL_DeleteContext(glContext);
 	//Destroy the window and quit SDL2, NB we should do this after all cleanup in this order!!!
 	//https://wiki.libsdl.org/SDL_DestroyWindow
