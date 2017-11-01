@@ -2,101 +2,6 @@
 
 #include "main.h"
 
-GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_path) {
-
-	// Create the shaders
-	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-	GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-	// Read the Vertex Shader code from the file
-	std::string VertexShaderCode;
-	std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
-	if (VertexShaderStream.is_open()) {
-		std::string Line = "";
-		while (getline(VertexShaderStream, Line))
-			VertexShaderCode += "\n" + Line;
-		VertexShaderStream.close();
-	}
-	else {
-		printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertex_file_path);
-		getchar();
-		return 0;
-	}
-
-	// Read the Fragment Shader code from the file
-	std::string FragmentShaderCode;
-	std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
-	if (FragmentShaderStream.is_open()) {
-		std::string Line = "";
-		while (getline(FragmentShaderStream, Line))
-			FragmentShaderCode += "\n" + Line;
-		FragmentShaderStream.close();
-	}
-
-	GLint Result = GL_FALSE;
-	int InfoLogLength;
-
-
-	// Compile Vertex Shader
-	printf("Compiling shader : %s\n", vertex_file_path);
-	char const * VertexSourcePointer = VertexShaderCode.c_str();
-	glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
-	glCompileShader(VertexShaderID);
-
-	// Check Vertex Shader
-	glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
-	glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if (InfoLogLength > 0) {
-		std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
-		glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
-		printf("%s\n", &VertexShaderErrorMessage[0]);
-	}
-
-
-
-	// Compile Fragment Shader
-	printf("Compiling shader : %s\n", fragment_file_path);
-	char const * FragmentSourcePointer = FragmentShaderCode.c_str();
-	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
-	glCompileShader(FragmentShaderID);
-
-	// Check Fragment Shader
-	glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
-	glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if (InfoLogLength > 0) {
-		std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
-		glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
-		printf("%s\n", &FragmentShaderErrorMessage[0]);
-	}
-
-
-
-	// Link the program
-	printf("Linking program\n");
-	GLuint ProgramID = glCreateProgram();
-	glAttachShader(ProgramID, VertexShaderID);
-	glAttachShader(ProgramID, FragmentShaderID);
-	glLinkProgram(ProgramID);
-
-	// Check the program
-	glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-	glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if (InfoLogLength > 0) {
-		std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
-		glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
-		printf("%s\n", &ProgramErrorMessage[0]);
-	}
-
-
-	glDetachShader(ProgramID, VertexShaderID);
-	glDetachShader(ProgramID, FragmentShaderID);
-
-	glDeleteShader(VertexShaderID);
-	glDeleteShader(FragmentShaderID);
-
-	return ProgramID;
-}
-
 int main(int argc, char* args[])
 {
 	//Initialises the SDL Library, passing in SDL_INIT_VIDEO to only initialise the video subsystems
@@ -108,6 +13,16 @@ int main(int argc, char* args[])
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_Init failed", SDL_GetError(), NULL);
 		return 1;
 	}
+	
+	// load support for JPG and PNG image formats (tiffs also supported, but not checked)
+	int flags = IMG_INIT_JPG | IMG_INIT_PNG;
+	int initted = IMG_Init(flags);
+	if ((initted&flags) != flags)
+	{
+		printf("IMG_Init: Failed to init required jpg and png support.\n");
+		printf("IMG_Init: %s\n", IMG_GetError());
+	}
+
 
 	//Create a window, note we have to free the pointer returned using the DestroyWindow Function
 	//https://wiki.libsdl.org/SDL_CreateWindow
@@ -157,67 +72,31 @@ int main(int argc, char* args[])
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	////Array of 3 vectors which represents 3 vertices
-	//static const GLfloat g_vertex_buffer_data[] =
-	//{
-	//	//Front
-	//	-0.5, 0.5, 0.5,		//0
-	//	0.5, 0.5, 0.5,		//1
-	//	-0.5, -0.5, 0.5,	//C
-	//	0.5, 0.5, 0.5,		//1
-	//	-0.5, -0.5, 0.5,	//C
-	//	0.5, -0.5, 0.5,		//D
+	/*Vertex triangleVertices[] =
+	{
+		{ -0.5f,-0.5f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f },
+		{ 0.5f,-0.5f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f,0.0f },
+		{ 0.5f,0.5f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f },
+		{ -0.5f,0.5f,0.0f,0.0f,0.0f,1.0f,1.0f ,0.0f,1.0f }
+	};
 
-	//	//Back
-	//	-0.5, 0.5, -0.5,	//E
-	//	0.5, 0.5, -0.5,		//F
-	//	-0.5, -0.5, -0.5,	//G
-	//	0.5, 0.5, -0.5,		//F
-	//	-0.5, -0.5, -0.5,	//G
-	//	0.5, -0.5, -0.5,	//H
-
-	//	//Left
-	//	-0.5, 0.5, 0.5,		//0
-	//	-0.5, 0.5, -0.5,	//E
-	//	-0.5, -0.5, -0.5,	//G
-	//	-0.5, 0.5, 0.5,		//A
-	//	-0.5, -0.5, -0.5,	//G
-	//	-0.5, -0.5, 0.5,	//C
-
-	//	//Right
-	//	0.5, -0.5, 0.5,		//D
-	//	0.5, 0.5, 0.5,		//B
-	//	0.5, 0.5, -0.5,		//F
-	//	0.5, 0.5, -0.5,		//F
-	//	0.5, -0.5, 0.5,		//D
-	//	0.5, -0.5, -0.5,	//H
-
-	//	//Bottom
-	//	-0.5, -0.5, -0.5,	//G
-	//	0.5, -0.5, -0.5,	//H
-	//	-0.5, -0.5, 0.5,	//C
-	//	-0.5, -0.5, 0.5,	//C
-	//	0.5, -0.5, 0.5,		//D
-	//	0.5, -0.5, -0.5,	//H
-
-	//	//Top
-	//	-0.5, 0.5, -0.5,	//E
-	//	0.5, 0.5, -0.5,		//F
-	//	0.5, 0.5, 0.5,		//B
-	//	-0.5, 0.5, 0.5,		//0
-	//	0.5, 0.5, 0.5,		//B
-	//	-0.5, 0.5, -0.5		//E
-	//};
-
+	unsigned int triangleIndices[] =
+	{
+		0,1,2,
+		2,0,3
+	};*/
+	
+	
+	// Cube vertices
 	Vertex triangleVertices[] = {
-		{ -0.5, 0.5, 0.5, 1.0f, 0.0f, 0.0f, 1.0f},		//A 0
-		{ 0.5, 0.5, 0.5, 0.0f, 1.0f, 0.0f, 1.0f },		//B 1
-		{ -0.5, -0.5, 0.5, 0.0f, 0.0f, 1.0f, 1.0f },	//C 2
-		{ 0.5, -0.5, 0.5, 1.0f, 1.0f, 0.0f, 1.0f },		//D 3
-		{ -0.5, 0.5, -0.5, 0.0f, 1.0f, 1.0f, 1.0f },	//E 4
-		{ 0.5, 0.5, -0.5, 1.0f, 0.0f, 1.0f, 1.0f },		//F 5
-		{ -0.5, -0.5, -0.5, 1.0f, 1.0f, 1.0f, 1.0f },	//G 6
-		{ 0.5, -0.5, -0.5, 0.0f, 0.0f, 0.0f, 1.0f },	//H 7
+		{ -0.5, 0.5, 0.5, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },		//A 0
+		{ 0.5, 0.5, 0.5, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f },		//B 1
+		{ -0.5, -0.5, 0.5, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f },	//C 2
+		{ 0.5, -0.5, 0.5, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f },		//D 3
+		{ -0.5, 0.5, -0.5, 0.0f, 1.0f, 1.0f, 1.0f , 0.0f, 0.0f },	//E 4
+		{ 0.5, 0.5, -0.5, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f },		//F 5
+		{ -0.5, -0.5, -0.5, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },	//G 6
+		{ 0.5, -0.5, -0.5, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f },	//H 7
 
 	};
 
@@ -244,6 +123,8 @@ int main(int argc, char* args[])
 
 	};
 
+
+
 	//Identify vetex buffer
 	GLuint vertexBuffer;
 	//Generate 1 buffer, put the resulting identifier in vertexBuffer
@@ -258,6 +139,8 @@ int main(int argc, char* args[])
 	glGenBuffers(1, &elementBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned int), triangleIndices, GL_STATIC_DRAW);
+
+	GLuint textureID = loadTextureFromFile("Crate.jpg");
 
 
 	vec3 trianglePosition = vec3(0.0f, 0.0f, 0.0f);
@@ -279,7 +162,7 @@ int main(int argc, char* args[])
 	mat4 projectionMatrix = perspective(radians(90.0f), float(4 / 3), 0.1f, 100.0f);
 
 	//Create and compile GLSL program from shaders
-	GLuint programID = LoadShaders("vert.glsl", "frag.glsl");
+	GLuint programID = LoadShaders("textureVert.glsl", "textureFrag.glsl");
 
 	GLint fragColorLocation = glGetUniformLocation(programID, "fragColor");
 	if (fragColorLocation < 0) 
@@ -311,6 +194,12 @@ int main(int argc, char* args[])
 	if (projectionMatrixLocation < 0)
 	{
 		printf("Unable to find %s uniform", "projectionMatrix");
+	}
+	
+	GLint textureLocation = glGetUniformLocation(programID, "baseTexture");
+	if (textureLocation < 0)
+	{
+		printf("Unable to find %s uniform", "baseTexture");
 	}
 
 	int lastTicks = SDL_GetTicks();
@@ -376,16 +265,19 @@ int main(int argc, char* args[])
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-		glUseProgram(programID);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textureID);
 
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
+
+		glUseProgram(programID);
 		glUniform4fv(fragColorLocation, 1, fragColor);
 		glUniform1f(currentTimeLocation, (float)(currentTicks) / 1000.0f);
 		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(modelMatrix));
 		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(viewMatrix));
 		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(projectionMatrix));
-
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
+		glUniform1i(textureLocation, 0);
 		
 		//1st attribute buffer : vertices
 		glEnableVertexAttribArray(0);
@@ -401,6 +293,9 @@ int main(int argc, char* args[])
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
 
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(7 * sizeof(float)));
+
 		//Draw the triangle
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)0);
 		SDL_GL_SwapWindow(window);
@@ -408,15 +303,19 @@ int main(int argc, char* args[])
 		lastTicks = currentTicks;
 	}
 
+	//Delete content
 	glDeleteProgram(programID);
 	glDeleteBuffers(1, &vertexBuffer);
 	glDeleteBuffers(1, &elementBuffer);
+	glDeleteTextures(1, &textureID);
 	glDeleteVertexArrays(1, &VertexArrayID);
-	//Delete content
 	SDL_GL_DeleteContext(glContext);
 	//Destroy the window and quit SDL2, NB we should do this after all cleanup in this order!!!
 	//https://wiki.libsdl.org/SDL_DestroyWindow
 	SDL_DestroyWindow(window);
+
+	IMG_Quit;
+
 	//https://wiki.libsdl.org/SDL_Quit
 	SDL_Quit();
 
