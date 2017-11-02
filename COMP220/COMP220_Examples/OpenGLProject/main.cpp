@@ -69,7 +69,7 @@ int main(int argc, char* args[])
 	}
 
 	std::vector<Mesh*> meshes;
-	loadMeshesFromFile("Tank1.FBX", meshes);
+	loadMeshFromFile("Tank1.FBX", meshes);
 	GLuint textureID = loadTextureFromFile("Tank1DF.png");
 
 	vec3 trianglePosition = vec3(0.0f, 0.0f, 0.0f);
@@ -210,7 +210,7 @@ int main(int argc, char* args[])
 		
 
 		//Draw the triangle
-		for (Mesh * currentMesh : meshes)
+		for (Mesh *currentMesh : meshes)
 		{
 			currentMesh->render();
 		}
@@ -226,7 +226,6 @@ int main(int argc, char* args[])
 	{
 		if ((*iter))
 		{
-			(*iter)->destroy();
 			delete (*iter);
 			iter = meshes.erase(iter);
 		}

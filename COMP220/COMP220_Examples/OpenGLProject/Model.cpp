@@ -69,7 +69,7 @@ bool loadModelFromFile(const std::string& filename, GLuint VBO, GLuint EBO, unsi
 	return true;
 }
 
-bool loadMeshesFromFile(const std::string & filename, std::vector<Mesh*>& meshes)
+bool loadMeshFromFile(const std::string & filename, std::vector<Mesh*>& meshes)
 {
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
@@ -127,7 +127,7 @@ bool loadMeshesFromFile(const std::string & filename, std::vector<Mesh*>& meshes
 			indices.push_back(currentFace.mIndices[2]);
 		}
 
-		ourCurrentMesh->copyMeshData(vertices, indices);
+		ourCurrentMesh->copyMeshData(vertices.data(), vertices.size(), indices.data(), indices.size());
 		meshes.push_back(ourCurrentMesh);
 
 		vertices.clear();

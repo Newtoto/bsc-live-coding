@@ -26,14 +26,16 @@ void Mesh::init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
 }
 
-void Mesh::copyMeshData(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices)
+void Mesh::copyMeshData(Vertex * pVerts, unsigned int numberOfVerts, unsigned int * pIndices, unsigned int numberOfIndices)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, numberOfVerts * sizeof(Vertex), pVerts, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(Vertex), indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numberOfIndices * sizeof(unsigned int), pIndices, GL_STATIC_DRAW);
 
+	m_numberOfVerts = numberOfVerts;
+	m_numberOfIndices = numberOfIndices;
 	glBindVertexArray(m_VAO);
 	//1st attribute buffer : vertices
 	glEnableVertexAttribArray(0);
@@ -51,9 +53,6 @@ void Mesh::copyMeshData(std::vector<Vertex>& vertices, std::vector<unsigned int>
 
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(7 * sizeof(float)));
-
-	m_numberOfVerts = vertices.size();
-	m_numberOfIndices = indices.size();
 }
 
 void Mesh::destroy()

@@ -13,7 +13,7 @@ public:
 	Mesh();
 	~Mesh();
 
-	void copyMeshData(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
+	void copyMeshData(Vertex * pVerts, unsigned int numberOfVerts, unsigned int * pIndices, unsigned int numberOfIndices);
 
 	void init();
 	void destroy();
