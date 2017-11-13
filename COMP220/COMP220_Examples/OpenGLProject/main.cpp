@@ -23,10 +23,12 @@ int main(int argc, char* args[])
 		printf("IMG_Init: %s\n", IMG_GetError());
 	}
 
+	int windowWidth = 800;
+	int windowHeight = 800;
 
 	//Create a window, note we have to free the pointer returned using the DestroyWindow Function
 	//https://wiki.libsdl.org/SDL_CreateWindow
-	SDL_Window* window = SDL_CreateWindow("SDL2 Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 800, SDL_WINDOW_SHOWN|SDL_WINDOW_OPENGL);
+	SDL_Window* window = SDL_CreateWindow("SDL2 Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_WINDOW_SHOWN|SDL_WINDOW_OPENGL);
 	//Checks to see if the window has been created, the pointer will have a value of some kind
 	if (window == nullptr)
 	{
@@ -37,6 +39,9 @@ int main(int argc, char* args[])
 		SDL_Quit();
 		return 1;
 	}
+
+	// Invisible mouse cursor
+	SDL_ShowCursor(SDL_DISABLE);
 
 	//Request 3.1 core OpenGL
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -82,11 +87,20 @@ int main(int argc, char* args[])
 
 	mat4 modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 
+	// default camera position
 	vec3 cameraPosition = vec3(0.0f, 0.0f, -5.0f);
 	vec3 cameraTarget = vec3(0.0f, 0.0f, 0.0f);
 	vec3 cameraUp = vec3(0.0f, 1.0f, 0.0f);
 
 	mat4 viewMatrix = lookAt(cameraPosition, cameraTarget, cameraUp);
+
+	vec3 position = cameraPosition;
+	float horizontalAngle = 0.0f;
+	float verticalAngle = 0.0f;
+	float fieldOfView = 45.0f;
+
+	float cameraSpeed = 2.0f;
+	float mouseSensitivity = 0.2;
 
 	mat4 projectionMatrix = perspective(radians(90.0f), float(4 / 3), 0.1f, 100.0f);
 
@@ -182,15 +196,32 @@ int main(int argc, char* args[])
 			}
 		}
 
+		currentTicks = SDL_GetTicks();
+		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
+
+
+		// Get mouse movement
+		int mouseX, mouseY;
+		SDL_GetMouseState(&mouseX, &mouseY);
+
+		horizontalAngle += mouseSensitivity * deltaTime * float(windowWidth / 2 - mouseX);
+		verticalAngle += mouseSensitivity * deltaTime * float(windowHeight / 2 - mouseY);
+
+		vec3 direction(cos(verticalAngle) * sin(horizontalAngle), sin(verticalAngle), cos(verticalAngle) * cos(horizontalAngle));
+
 		//Recalculate camera
-		viewMatrix = lookAt(cameraPosition, cameraTarget, cameraUp);
+		viewMatrix = lookAt(cameraPosition, direction + cameraPosition, cameraUp);
 
 		//Recalculate translations
 		rotationMatrix = rotate(triangleRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(triangleRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(triangleRotation.z, vec3(1.0f, 0.0f, 1.0f));
 		modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 
-		currentTicks = SDL_GetTicks();
-		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
+		// Snap mouse to center
+		void SDL_WarpMouseInWindow(SDL_Window* window,
+			int         x,
+			int         y
+		);
+		SDL_WarpMouseInWindow(window, windowWidth/2, windowHeight/2);
 
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClearDepth(1.0f);
