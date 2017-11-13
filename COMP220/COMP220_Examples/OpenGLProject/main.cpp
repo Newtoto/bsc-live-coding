@@ -217,10 +217,6 @@ int main(int argc, char* args[])
 		modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 
 		// Snap mouse to center
-		void SDL_WarpMouseInWindow(SDL_Window* window,
-			int         x,
-			int         y
-		);
 		SDL_WarpMouseInWindow(window, windowWidth/2, windowHeight/2);
 
 		glClearColor(0.0, 0.0, 0.0, 1.0);
