@@ -271,7 +271,7 @@ int main(int argc, char* args[])
 	//https://wiki.libsdl.org/SDL_DestroyWindow
 	SDL_DestroyWindow(window);
 
-	IMG_Quit;
+	IMG_Quit();
 
 	//https://wiki.libsdl.org/SDL_Quit
 	SDL_Quit();
