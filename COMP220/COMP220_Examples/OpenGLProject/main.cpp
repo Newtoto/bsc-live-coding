@@ -2,19 +2,7 @@
 
 #include "main.h"
 
-int main(int argc, char* args[])
-{
-	//Initialises the SDL Library, passing in SDL_INIT_VIDEO to only initialise the video subsystems
-	//https://wiki.libsdl.org/SDL_Init
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
-	{
-		//Display an error message box
-		//https://wiki.libsdl.org/SDL_ShowSimpleMessageBox
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_Init failed", SDL_GetError(), NULL);
-		return 1;
-	}
-	
-	// load support for JPG and PNG image formats (tiffs also supported, but not checked)
+void loadImageSupport() {
 	int flags = IMG_INIT_JPG | IMG_INIT_PNG;
 	int initted = IMG_Init(flags);
 	if ((initted&flags) != flags)
@@ -22,42 +10,44 @@ int main(int argc, char* args[])
 		printf("IMG_Init: Failed to init required jpg and png support.\n");
 		printf("IMG_Init: %s\n", IMG_GetError());
 	}
+}
 
-	int windowWidth = 800;
-	int windowHeight = 800;
+void requestCoreOpenGL(int majorVersion, int minorVersion) {
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minorVersion);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+}
 
-	//Create a window, note we have to free the pointer returned using the DestroyWindow Function
-	//https://wiki.libsdl.org/SDL_CreateWindow
-	SDL_Window* window = SDL_CreateWindow("SDL2 Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_WINDOW_SHOWN|SDL_WINDOW_OPENGL);
-	//Checks to see if the window has been created, the pointer will have a value of some kind
-	if (window == nullptr)
+int initialiseSDLWindowAndOpenGL(int windowWidth, int windowHeight) {
+	// load support for JPG and PNG image formats (tiffs also supported, but not checked)
+	loadImageSupport();
+	//Request 3.1 core OpenGL
+	requestCoreOpenGL(3, 1);
+
+	//Initialises the SDL Library, passing in SDL_INIT_VIDEO to only initialise the video subsystems
+	//https://wiki.libsdl.org/SDL_Init
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		//Show error
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_CreateWindow failed", SDL_GetError(), NULL);
-		//Close the SDL Library
-		//https://wiki.libsdl.org/SDL_Quit
-		SDL_Quit();
 		return 1;
 	}
 
-	// Invisible mouse cursor
-	SDL_ShowCursor(SDL_DISABLE);
+	//Create a window, note we have to free the pointer returned using the DestroyWindow Function
+	//https://wiki.libsdl.org/SDL_CreateWindow
+	window = SDL_CreateWindow("SDL2 Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+	//Checks to see if the window has been created, the pointer will have a value of some kind
+	if (window == nullptr)
+	{
+		return 1;
+	}
 
-	//Request 3.1 core OpenGL
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	// Hide mouse cursor
+	SDL_ShowCursor(SDL_DISABLE);
 
 	SDL_GLContext glContext = SDL_GL_CreateContext(window);
 	if (glContext == nullptr)
 	{
-			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL_CreateContent failed", SDL_GetError(), NULL);
-
-			SDL_DestroyWindow(window);
-			SDL_Quit();
-
-			return 1;
+		return 1;
 	}
 
 	//Init GLEW
@@ -65,12 +55,27 @@ int main(int argc, char* args[])
 	GLenum err = glewInit();
 	if (err != GLEW_OK)
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "GLEW initialisation failed", (char*)glewGetErrorString(err), NULL);
-
-		SDL_DestroyWindow(window);
-		SDL_Quit();
-
 		return 1;
+	}
+}
+
+void quitSDL() {
+	// Clean up
+	SDL_GL_DeleteContext(glContext);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+};
+
+int main(int argc, char* args[])
+{
+	// Define window size
+	int windowWidth = 800;
+	int windowHeight = 800;
+
+	// Check SDL initialisation
+	if (initialiseSDLWindowAndOpenGL(windowWidth, windowHeight) == 1) {
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, SDL_GetError(), "SDL and openGL failed to initialise", NULL);
+		quitSDL();
 	}
 
 	std::vector<Mesh*> meshes;
@@ -120,31 +125,26 @@ int main(int argc, char* args[])
 	{
 		printf("Unable to find %s uniform", "time");
 	}
-
 	GLint modelMatrixLocation = glGetUniformLocation(programID, "modelMatrix");
 	if (modelMatrixLocation < 0)
 	{
 		printf("Unable to find %s uniform", "modelMatrix");
 	}
-
 	GLint viewMatrixLocation = glGetUniformLocation(programID, "viewMatrix");
 	if (viewMatrixLocation < 0)
 	{
 		printf("Unable to find %s uniform", "viewMatrix");
 	}
-
 	GLint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
 	if (projectionMatrixLocation < 0)
 	{
 		printf("Unable to find %s uniform", "projectionMatrix");
 	}
-	
 	GLint textureLocation = glGetUniformLocation(programID, "baseTexture");
 	if (textureLocation < 0)
 	{
 		printf("Unable to find %s uniform", "baseTexture");
 	}
-
 	glEnable(GL_DEPTH_TEST);
 	int lastTicks = SDL_GetTicks();
 	int currentTicks = SDL_GetTicks();
@@ -154,6 +154,7 @@ int main(int argc, char* args[])
 	bool running = true;
 	//SDL Event structure, this will be checked in the while loop
 	SDL_Event ev;
+
 	while (running)
 	{
 		//Poll for the events which have happened in this frame
@@ -206,10 +207,10 @@ int main(int argc, char* args[])
 		// Snap mouse to center
 		SDL_WarpMouseInWindow(window, windowWidth / 2, windowHeight / 2);
 
+		// Move camera based on mouse movement
 		horizontalAngle += mouseSensitivity * float(windowWidth / 2 - mouseX);
 		verticalAngle += mouseSensitivity * float(windowHeight / 2 - mouseY);
 		printf("%", verticalAngle);
-
 		vec3 direction(cos(verticalAngle) * sin(horizontalAngle), sin(verticalAngle), cos(verticalAngle) * cos(horizontalAngle));
 
 		//Recalculate camera
@@ -219,6 +220,7 @@ int main(int argc, char* args[])
 		rotationMatrix = rotate(triangleRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(triangleRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(triangleRotation.z, vec3(1.0f, 0.0f, 1.0f));
 		modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 
+		// Clear the screen
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClearDepth(1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);

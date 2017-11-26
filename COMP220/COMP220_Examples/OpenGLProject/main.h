@@ -17,4 +17,15 @@
 #include "Texture.h"
 #include "Model.h"
 
+void loadImageSupport();
+void requestCoreOpenGL(int majVer, int minVer);
+
+int initialiseSDLWindowAndOpenGL(int windowWidth, int windowHeight);
+void quitSDL();
+
+SDL_Window* window;
+SDL_GLContext glContext;
+int windowWidth;
+int windowHeight;
+
 using namespace glm;
