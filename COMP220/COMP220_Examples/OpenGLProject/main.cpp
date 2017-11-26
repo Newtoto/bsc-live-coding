@@ -88,7 +88,7 @@ int main(int argc, char* args[])
 	mat4 modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 
 	// default camera position
-	vec3 cameraPosition = vec3(0.0f, 0.0f, -5.0f);
+	vec3 cameraPosition = vec3(0.0f, 2.0f, -5.0f);
 	vec3 cameraTarget = vec3(0.0f, 0.0f, 0.0f);
 	vec3 cameraUp = vec3(0.0f, 1.0f, 0.0f);
 
@@ -100,7 +100,7 @@ int main(int argc, char* args[])
 	float fieldOfView = 45.0f;
 
 	float cameraSpeed = 2.0f;
-	float mouseSensitivity = 0.2;
+	float mouseSensitivity = 0.01;
 
 	mat4 projectionMatrix = perspective(radians(90.0f), float(4 / 3), 0.1f, 100.0f);
 
@@ -199,13 +199,16 @@ int main(int argc, char* args[])
 		currentTicks = SDL_GetTicks();
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
 
-
 		// Get mouse movement
 		int mouseX, mouseY;
 		SDL_GetMouseState(&mouseX, &mouseY);
 
-		horizontalAngle += mouseSensitivity * deltaTime * float(windowWidth / 2 - mouseX);
-		verticalAngle += mouseSensitivity * deltaTime * float(windowHeight / 2 - mouseY);
+		// Snap mouse to center
+		SDL_WarpMouseInWindow(window, windowWidth / 2, windowHeight / 2);
+
+		horizontalAngle += mouseSensitivity * float(windowWidth / 2 - mouseX);
+		verticalAngle += mouseSensitivity * float(windowHeight / 2 - mouseY);
+		printf("%", verticalAngle);
 
 		vec3 direction(cos(verticalAngle) * sin(horizontalAngle), sin(verticalAngle), cos(verticalAngle) * cos(horizontalAngle));
 
@@ -215,9 +218,6 @@ int main(int argc, char* args[])
 		//Recalculate translations
 		rotationMatrix = rotate(triangleRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(triangleRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(triangleRotation.z, vec3(1.0f, 0.0f, 1.0f));
 		modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
-
-		// Snap mouse to center
-		SDL_WarpMouseInWindow(window, windowWidth/2, windowHeight/2);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClearDepth(1.0f);
