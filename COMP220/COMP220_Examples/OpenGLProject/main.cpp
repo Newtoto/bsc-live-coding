@@ -78,19 +78,21 @@ int main(int argc, char* args[])
 		quitSDL();
 	}
 
+	// Add first tank
 	std::vector<Mesh*> meshes;
 	loadMeshFromFile("Tank1.FBX", meshes);
 	GLuint textureID = loadTextureFromFile("Tank1DF.png");
 
-	vec3 trianglePosition = vec3(0.0f, 0.0f, 0.0f);
-	vec3 triangleScale = vec3(1.0f, 1.0f, 1.0f);
-	vec3 triangleRotation = vec3(0.0f, 0.0f, 0.0f);
+	vec3 objectPosition = vec3(0.0f, 0.0f, 0.0f);
+	vec3 objectScale = vec3(1.0f, 1.0f, 1.0f);
+	vec3 objectRotation = vec3(0.0f, 0.0f, 0.0f);
 
-	mat4 rotationMatrix = rotate(triangleRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(triangleRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(triangleRotation.z, vec3(1.0f, 0.0f, 1.0f));
-	mat4 scaleMatrix = scale(triangleScale);
-	mat4 translationMatrix = translate(trianglePosition);
+	mat4 rotationMatrix = rotate(objectRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(objectRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(objectRotation.z, vec3(1.0f, 0.0f, 1.0f));
+	mat4 scaleMatrix = scale(objectScale);
+	mat4 translationMatrix = translate(objectPosition);
 
 	mat4 modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
+
 
 	// default camera position
 	vec3 cameraPosition = vec3(0.0f, 2.0f, -5.0f);
@@ -210,14 +212,15 @@ int main(int argc, char* args[])
 		// Move camera based on mouse movement
 		horizontalAngle += mouseSensitivity * float(windowWidth / 2 - mouseX);
 		verticalAngle += mouseSensitivity * float(windowHeight / 2 - mouseY);
+		verticalAngle = clamp(verticalAngle, -0.3f, 0.7f);
 		printf("%", verticalAngle);
 		vec3 direction(cos(verticalAngle) * sin(horizontalAngle), sin(verticalAngle), cos(verticalAngle) * cos(horizontalAngle));
 
 		//Recalculate camera
 		viewMatrix = lookAt(cameraPosition, direction + cameraPosition, cameraUp);
 
-		//Recalculate translations
-		rotationMatrix = rotate(triangleRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(triangleRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(triangleRotation.z, vec3(1.0f, 0.0f, 1.0f));
+		//Recalculate object position
+		rotationMatrix = rotate(objectRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(objectRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(objectRotation.z, vec3(1.0f, 0.0f, 1.0f));
 		modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 
 		// Clear the screen
