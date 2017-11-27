@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{C564CA2E-53D2-A446-AE7F-4213F7B115A6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\BulletInverseDynamics">
+      <UniqueIdentifier>{101FA9D9-BD10-3C44-AEF1-8324AB7AEB92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\BulletInverseDynamics\details">
+      <UniqueIdentifier>{2EC79F21-6A85-724B-9ED4-1C18CA11B737}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\BulletInverseDynamics\IDMath.cpp">
+      <Filter>src\BulletInverseDynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\BulletInverseDynamics\MultiBodyTree.cpp">
+      <Filter>src\BulletInverseDynamics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\BulletInverseDynamics\details\MultiBodyTreeInitCache.cpp">
+      <Filter>src\BulletInverseDynamics\details</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\BulletInverseDynamics\details\MultiBodyTreeImpl.cpp">
+      <Filter>src\BulletInverseDynamics\details</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

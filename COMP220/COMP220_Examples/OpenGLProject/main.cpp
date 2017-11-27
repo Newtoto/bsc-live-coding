@@ -151,6 +151,39 @@ int main(int argc, char* args[])
 	int lastTicks = SDL_GetTicks();
 	int currentTicks = SDL_GetTicks();
 
+	// BULLET PHYSICS
+	///collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
+	btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+
+	///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
+	btCollisionDispatcher* dispatcher = new	btCollisionDispatcher(collisionConfiguration);
+
+	///btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
+	btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
+
+	///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
+	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+
+	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
+
+	dynamicsWorld->setGravity(btVector3(0, -10, 0));
+
+	btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(1.), btScalar(50.)));
+
+	btTransform groundTransform;
+	groundTransform.setIdentity();
+	groundTransform.setOrigin(btVector3(0, -56, 0));
+
+	btScalar mass(0.);
+	btVector3 localInertia(0, 0, 0);
+
+	//using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
+	btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
+	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, groundShape, localInertia);
+	btRigidBody* groundBody = new btRigidBody(rbInfo);
+
+	//add the body to the dynamics world
+	dynamicsWorld->addRigidBody(groundBody);
 
 	//Event loop, we will loop until running is set to false, usually if escape has been pressed or window is closed
 	bool running = true;
@@ -253,6 +286,20 @@ int main(int argc, char* args[])
 	}
 
 	//Delete content
+	//delete dynamics world
+	delete dynamicsWorld;
+
+	//delete solver
+	delete solver;
+
+	//delete broadphase
+	delete overlappingPairCache;
+
+	//delete dispatcher
+	delete dispatcher;
+
+	delete collisionConfiguration;
+
 	auto iter = meshes.begin();
 	while (iter != meshes.end())
 	{

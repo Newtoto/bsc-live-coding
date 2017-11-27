@@ -1,0 +1,5 @@
+﻿  bChunk.cpp
+  bDNA.cpp
+  bFile.cpp
+  btBulletFile.cpp
+  BulletFileLoader.vcxproj -> C:\Users\User\GitHub\bsc-live-coding-newtoto\Libraries\bullet3-2.86.1\build3\vs2010\..\..\bin\BulletFileLoader_vs2010_x64_debug.lib

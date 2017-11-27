@@ -17,6 +17,8 @@
 #include "Texture.h"
 #include "Model.h"
 
+#include "btBulletDynamicsCommon.h"
+
 void loadImageSupport();
 void requestCoreOpenGL(int majVer, int minVer);
 

@@ -91,11 +91,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\..\..\Libraries\assimp\include;..\..\..\Libraries\glm-0.9.9-a1;..\..\..\Libraries\glew-2.1.0\include;..\..\..\Libraries\SDL2-2.0.6\include;..\..\..\Libraries\SDL2_image-2.0.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\Libraries\bullet3-2.86.1\src;..\..\..\Libraries\assimp\include;..\..\..\Libraries\glm-0.9.9-a1;..\..\..\Libraries\glew-2.1.0\include;..\..\..\Libraries\SDL2-2.0.6\include;..\..\..\Libraries\SDL2_image-2.0.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>Multi-threaded Debug (/MDd)</RuntimeLibrary>
+      <PreprocessorDefinitions>BT_USE_DOUBLE_PRECISION;_DEBUG=1;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\..\Libraries\assimp\lib;..\..\..\Libraries\SDL2_image-2.0.1\lib\x64;..\..\..\Libraries\glew-2.1.0\lib\Release\x64;..\..\..\Libraries\SDL2-2.0.6\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc140-mt.lib;SDL2_image.lib;SDL2.lib;SDL2main.lib;glew32.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\Libraries\assimp\lib;..\..\..\Libraries\bullet3-2.86.1\bin;..\..\..\Libraries\SDL2_image-2.0.1\lib\x64;..\..\..\Libraries\glew-2.1.0\lib\Release\x64;..\..\..\Libraries\SDL2-2.0.6\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>BulletDynamics_vs2010_x64_debug.lib;BulletCollision_vs2010_x64_debug.lib;LinearMath_vs2010_x64_debug.lib;assimp-vc140-mt.lib;SDL2_image.lib;SDL2.lib;SDL2main.lib;glew32.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
