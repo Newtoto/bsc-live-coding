@@ -79,20 +79,9 @@ int main(int argc, char* args[])
 	}
 
 	// Add first tank
-	std::vector<Mesh*> meshes;
-	loadMeshFromFile("Tank1.FBX", meshes);
-	GLuint textureID = loadTextureFromFile("Tank1DF.png");
-
-	vec3 objectPosition = vec3(0.0f, 0.0f, 0.0f);
-	vec3 objectScale = vec3(1.0f, 1.0f, 1.0f);
-	vec3 objectRotation = vec3(0.0f, 0.0f, 0.0f);
-
-	mat4 rotationMatrix = rotate(objectRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(objectRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(objectRotation.z, vec3(1.0f, 0.0f, 1.0f));
-	mat4 scaleMatrix = scale(objectScale);
-	mat4 translationMatrix = translate(objectPosition);
-
-	mat4 modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
-
+	GameObject tank;
+	tank.init();
+	tank.update();
 
 	// default camera position
 	vec3 cameraPosition = vec3(0.0f, 2.0f, -5.0f);
@@ -151,39 +140,41 @@ int main(int argc, char* args[])
 	int lastTicks = SDL_GetTicks();
 	int currentTicks = SDL_GetTicks();
 
-	// BULLET PHYSICS
-	///collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
-	btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+	//// BULLET PHYSICS
+	/////collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
+	//btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
 
-	///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
-	btCollisionDispatcher* dispatcher = new	btCollisionDispatcher(collisionConfiguration);
+	/////use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
+	//btCollisionDispatcher* dispatcher = new	btCollisionDispatcher(collisionConfiguration);
 
-	///btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
-	btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
+	/////btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
+	//btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
 
-	///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
-	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+	/////the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
+	//btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
 
-	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
+	//btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 
-	dynamicsWorld->setGravity(btVector3(0, -10, 0));
+	//dynamicsWorld->setGravity(btVector3(0, -10, 0));
 
-	btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(1.), btScalar(50.)));
+	//btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(1.), btScalar(50.)));
 
-	btTransform groundTransform;
-	groundTransform.setIdentity();
-	groundTransform.setOrigin(btVector3(0, -56, 0));
+	//btTransform groundTransform;
+	//groundTransform.setIdentity();
+	//groundTransform.setOrigin(btVector3(0, -56, 0));
 
-	btScalar mass(0.);
-	btVector3 localInertia(0, 0, 0);
+	//btScalar mass(0.);
+	//btVector3 localInertia(0, 0, 0);
 
-	//using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
-	btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
-	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, groundShape, localInertia);
-	btRigidBody* groundBody = new btRigidBody(rbInfo);
+	////using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
+	//btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
+	//btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, groundShape, localInertia);
+	//btRigidBody* groundBody = new btRigidBody(rbInfo);
 
-	//add the body to the dynamics world
-	dynamicsWorld->addRigidBody(groundBody);
+	////add the body to the dynamics world
+	//dynamicsWorld->addRigidBody(groundBody);
+
+	SDL_WarpMouseInWindow(window, windowWidth / 2, windowHeight / 2);
 
 	//Event loop, we will loop until running is set to false, usually if escape has been pressed or window is closed
 	bool running = true;
@@ -253,8 +244,7 @@ int main(int argc, char* args[])
 		viewMatrix = lookAt(cameraPosition, direction + cameraPosition, cameraUp);
 
 		//Recalculate object position
-		rotationMatrix = rotate(objectRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(objectRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(objectRotation.z, vec3(1.0f, 0.0f, 1.0f));
-		modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
+		tank.update();
 
 		// Clear the screen
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -262,60 +252,42 @@ int main(int argc, char* args[])
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, textureID);
+		glBindTexture(GL_TEXTURE_2D, tank.textureID);
 
 		glUseProgram(programID);
 
 		glUniform4fv(fragColorLocation, 1, fragColor);
 		glUniform1f(currentTimeLocation, (float)(currentTicks) / 1000.0f);
-		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(modelMatrix));
+		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(tank.modelMatrix));
 		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(viewMatrix));
 		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(projectionMatrix));
 		glUniform1i(textureLocation, 0);
 		
 
 		//Draw the triangle
-		for (Mesh *currentMesh : meshes)
-		{
-			currentMesh->render();
-		}
+		tank.draw();
 
 		SDL_GL_SwapWindow(window);
 
 		lastTicks = currentTicks;
 	}
 
-	//Delete content
-	//delete dynamics world
-	delete dynamicsWorld;
+	////Delete content
+	////delete dynamics world
+	//delete dynamicsWorld;
 
-	//delete solver
-	delete solver;
+	////delete solver
+	//delete solver;
 
-	//delete broadphase
-	delete overlappingPairCache;
+	////delete broadphase
+	//delete overlappingPairCache;
 
-	//delete dispatcher
-	delete dispatcher;
+	////delete dispatcher
+	//delete dispatcher;
 
-	delete collisionConfiguration;
+	//delete collisionConfiguration;
 
-	auto iter = meshes.begin();
-	while (iter != meshes.end())
-	{
-		if ((*iter))
-		{
-			delete (*iter);
-			iter = meshes.erase(iter);
-		}
-		else
-		{
-			iter++;
-		}
-	}
-	meshes.clear();
-
-	glDeleteTextures(1, &textureID);
+	tank.destroy();
 	glDeleteProgram(programID);
 
 	SDL_GL_DeleteContext(glContext);
