@@ -1,0 +1,23 @@
+﻿  glew.c
+  EGLOpenGLWindow.cpp
+  fontstash.cpp
+  GLInstancingRenderer.cpp
+  GLPrimitiveRenderer.cpp
+  GLRenderToTexture.cpp
+  LoadShader.cpp
+  opengl_fontstashcallbacks.cpp
+  OpenSans.cpp
+  SimpleCamera.cpp
+c:\users\user\github\bsc-live-coding-newtoto\libraries\bullet3-2.86.1\examples\openglwindow\stb_image_write.h(156): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. (compiling source file ..\..\examples\OpenGLWindow\opengl_fontstashcallbacks.cpp)
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(207): note: see declaration of 'fopen' (compiling source file ..\..\examples\OpenGLWindow\opengl_fontstashcallbacks.cpp)
+..\..\examples\OpenGLWindow\fontstash.cpp(225): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(207): note: see declaration of 'fopen'
+c:\users\user\github\bsc-live-coding-newtoto\libraries\bullet3-2.86.1\examples\openglwindow\stb_image_write.h(495): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. (compiling source file ..\..\examples\OpenGLWindow\opengl_fontstashcallbacks.cpp)
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(207): note: see declaration of 'fopen' (compiling source file ..\..\examples\OpenGLWindow\opengl_fontstashcallbacks.cpp)
+  SimpleOpenGL2App.cpp
+  SimpleOpenGL2Renderer.cpp
+  SimpleOpenGL3App.cpp
+  TwFonts.cpp
+  Win32OpenGLWindow.cpp
+  Win32Window.cpp
+  OpenGL_Window.vcxproj -> C:\Users\User\GitHub\bsc-live-coding-newtoto\Libraries\bullet3-2.86.1\build3\vs2010\..\..\bin\OpenGL_Window_vs2010_x64_debug.lib

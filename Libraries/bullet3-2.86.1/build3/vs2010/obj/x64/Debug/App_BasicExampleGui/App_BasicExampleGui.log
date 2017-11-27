@@ -1,0 +1,9 @@
+﻿  glew.c
+  BasicExample.cpp
+  main_opengl_single_example.cpp
+  OpenGLGuiHelper.cpp
+  GL_ShapeDrawer.cpp
+  CollisionShape2TriangleMesh.cpp
+  b3Clock.cpp
+  App_BasicExampleGui.vcxproj -> C:\Users\User\GitHub\bsc-live-coding-newtoto\Libraries\bullet3-2.86.1\build3\vs2010\..\..\bin\App_BasicExampleGui_vs2010_x64_debug.exe
+  App_BasicExampleGui.vcxproj -> ..\..\bin\App_BasicExampleGui_vs2010_x64_debug.pdb (Partial PDB)

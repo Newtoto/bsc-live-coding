@@ -10,5 +10,6 @@ uniform vec4 fragColor = vec4(1.0, 1.0, 1.0, 1.0);
 uniform sampler2D baseTexture;
 
 void main(){
-	color = texture2D(baseTexture, vertexTextureCoordOut);
+	color = texture(baseTexture, vertexTextureCoordOut);
+	//color = vec4(1.0, 1.0, 1.0, 1.0);
 }
