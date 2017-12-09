@@ -93,11 +93,15 @@ bool loadMeshFromFile(const std::string & filename, std::vector<Mesh*>& meshes)
 		for (unsigned int v = 0; v < currentAIMesh->mNumVertices; v++)
 		{
 			const aiVector3D currentAIPosition = currentAIMesh->mVertices[v];
+			const aiVector3D currentAINormals = currentAIMesh->mNormals[v];
 
 			Vertex ourVertex;
 			ourVertex.x = currentAIPosition.x; ourVertex.y = currentAIPosition.y; ourVertex.z = currentAIPosition.z;
 			ourVertex.r = 1.0f; ourVertex.g = 1.0f; ourVertex.b = 1.0f; ourVertex.a = 1.0f;
 			ourVertex.tu = 0.0; ourVertex.tv = 0.0;
+			ourVertex.normalX = currentAINormals.x;
+			ourVertex.normalY = currentAINormals.y;
+			ourVertex.normalZ = currentAINormals.z;
 
 			if (currentAIMesh->HasTextureCoords(0))
 			{

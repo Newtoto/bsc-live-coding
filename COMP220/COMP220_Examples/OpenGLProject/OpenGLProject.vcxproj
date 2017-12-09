@@ -155,6 +155,8 @@ copy ..\..\..\Libraries\glew-2.1.0\bin\Release\x64\glew32.dll "$(OutDir)\glew32.
     <None Include="colorFrag.glsl" />
     <None Include="colorVert.glsl" />
     <None Include="cube.nff" />
+    <None Include="lightingFrag.glsl" />
+    <None Include="lightingVert.glsl" />
     <None Include="textureFrag.glsl" />
     <None Include="textureVert.glsl" />
   </ItemGroup>

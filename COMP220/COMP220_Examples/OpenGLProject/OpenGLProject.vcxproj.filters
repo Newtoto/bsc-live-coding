@@ -59,5 +59,7 @@
     <None Include="textureFrag.glsl" />
     <None Include="textureVert.glsl" />
     <None Include="cube.nff" />
+    <None Include="lightingFrag.glsl" />
+    <None Include="lightingVert.glsl" />
   </ItemGroup>
 </Project>

@@ -53,6 +53,9 @@ void Mesh::copyMeshData(Vertex * pVerts, unsigned int numberOfVerts, unsigned in
 
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(7 * sizeof(float)));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(9 * sizeof(float)));
 }
 
 void Mesh::destroy()

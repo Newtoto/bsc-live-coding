@@ -100,8 +100,15 @@ int main(int argc, char* args[])
 
 	mat4 projectionMatrix = perspective(radians(90.0f), float(4 / 3), 0.1f, 100.0f);
 
+	// Lighting
+	vec3 lightDirection = vec3(0.0f, 0.0f, -1.0f);
+	vec4 diffuseLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// Material
+	vec4 diffuseMaterialColor = vec4(0.8f, 0.8f, 0.8f, 1.0f);
+
 	//Create and compile GLSL program from shaders
-	GLuint programID = LoadShaders("textureVert.glsl", "textureFrag.glsl");
+	GLuint programID = LoadShaders("lightingVert.glsl", "lightingFrag.glsl");
 
 	GLint fragColorLocation = glGetUniformLocation(programID, "fragColor");
 	if (fragColorLocation < 0) 
@@ -136,6 +143,22 @@ int main(int argc, char* args[])
 	{
 		printf("Unable to find %s uniform", "baseTexture");
 	}
+	GLint lightDirectionLocation = glGetUniformLocation(programID, "lightDirection");
+	if (lightDirectionLocation < 0)
+	{
+		printf("Unable to find %s uniform", "lightDirection");
+	}
+	GLint diffuseLightColorLocation = glGetUniformLocation(programID, "diffuseLightColor");
+	if (diffuseLightColorLocation < 0)
+	{
+		printf("Unable to find %s uniform", "diffuseLightColor");
+	}
+	GLint diffuseMaterialColorLocation = glGetUniformLocation(programID, "diffuseMaterialColor");
+	if (diffuseLightColorLocation < 0)
+	{
+		printf("Unable to find %s uniform", "diffuseMaterialColor");
+	}
+
 	glEnable(GL_DEPTH_TEST);
 	int lastTicks = SDL_GetTicks();
 	int currentTicks = SDL_GetTicks();
@@ -262,6 +285,10 @@ int main(int argc, char* args[])
 		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(viewMatrix));
 		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(projectionMatrix));
 		glUniform1i(textureLocation, 0);
+
+		glUniform3fv(lightDirectionLocation, 1, value_ptr(lightDirection));
+		glUniform4fv(diffuseLightColorLocation, 1, value_ptr(diffuseLightColor));
+		glUniform4fv(diffuseMaterialColorLocation, 1, value_ptr(diffuseMaterialColor));
 		
 
 		//Draw the triangle
