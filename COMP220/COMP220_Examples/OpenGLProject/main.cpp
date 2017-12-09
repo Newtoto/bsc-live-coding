@@ -103,9 +103,13 @@ int main(int argc, char* args[])
 	// Lighting
 	vec3 lightDirection = vec3(0.0f, 0.0f, -1.0f);
 	vec4 diffuseLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	vec4 specularLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Material
 	vec4 diffuseMaterialColor = vec4(0.8f, 0.8f, 0.8f, 1.0f);
+	vec4 specualarMaterialColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+	float specularPower = 25.0f;
 
 	//Create and compile GLSL program from shaders
 	GLuint programID = LoadShaders("lightingVert.glsl", "lightingFrag.glsl");
@@ -123,6 +127,7 @@ int main(int argc, char* args[])
 	{
 		printf("Unable to find %s uniform", "time");
 	}
+
 	GLint modelMatrixLocation = glGetUniformLocation(programID, "modelMatrix");
 	if (modelMatrixLocation < 0)
 	{
@@ -143,6 +148,13 @@ int main(int argc, char* args[])
 	{
 		printf("Unable to find %s uniform", "baseTexture");
 	}
+	GLint cameraPositionLocation = glGetUniformLocation(programID, "cameraPosition");
+	if (cameraPositionLocation < 0)
+	{
+		printf("Unable to find %s uniform", "cameraPosition");
+	}
+
+	// Lighting
 	GLint lightDirectionLocation = glGetUniformLocation(programID, "lightDirection");
 	if (lightDirectionLocation < 0)
 	{
@@ -153,10 +165,27 @@ int main(int argc, char* args[])
 	{
 		printf("Unable to find %s uniform", "diffuseLightColor");
 	}
+	GLint specularLightColorLocation = glGetUniformLocation(programID, "specularLightColor");
+	if (specularLightColorLocation < 0)
+	{
+		printf("Unable to find %s uniform", "specularLightColor");
+	}
+	GLint specularPowerLocation = glGetUniformLocation(programID, "specularPower");
+	if (specularPowerLocation < 0)
+	{
+		printf("Unable to find %s uniform", "specularMaterialPower");
+	}
+
+	// Material
 	GLint diffuseMaterialColorLocation = glGetUniformLocation(programID, "diffuseMaterialColor");
 	if (diffuseLightColorLocation < 0)
 	{
 		printf("Unable to find %s uniform", "diffuseMaterialColor");
+	}
+	GLint specularMaterialColorLocation = glGetUniformLocation(programID, "specularMaterialColor");
+	if (specularMaterialColorLocation < 0)
+	{
+		printf("Unable to find %s uniform", "specularMaterialColor");
 	}
 
 	glEnable(GL_DEPTH_TEST);
@@ -284,11 +313,19 @@ int main(int argc, char* args[])
 		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(tank.modelMatrix));
 		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(viewMatrix));
 		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(projectionMatrix));
+
+		glUniform3fv(cameraPositionLocation, 1, value_ptr(cameraPosition));
 		glUniform1i(textureLocation, 0);
 
+		// Lighting
 		glUniform3fv(lightDirectionLocation, 1, value_ptr(lightDirection));
 		glUniform4fv(diffuseLightColorLocation, 1, value_ptr(diffuseLightColor));
+		glUniform4fv(specularLightColorLocation, 1, value_ptr(specularLightColor));
+		glUniform1f(specularPowerLocation, specularPower);
+
+		// Material
 		glUniform4fv(diffuseMaterialColorLocation, 1, value_ptr(diffuseMaterialColor));
+		glUniform4fv(specularMaterialColorLocation, 1, value_ptr(specularLightColor));
 		
 
 		//Draw the triangle
