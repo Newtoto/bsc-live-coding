@@ -16,10 +16,12 @@ uniform vec3 cameraPosition;
 
 // Lighting
 uniform vec3 lightDirection;
+uniform vec4 ambientLightColor;
 uniform vec4 diffuseLightColor;
 uniform vec4 specularLightColor;
 
 // Material
+uniform vec4 ambientMaterialColor;
 uniform vec4 diffuseMaterialColor;
 uniform vec4 specularMaterialColor;
 uniform float specularPower;
@@ -28,6 +30,7 @@ out vec4 vertexColorOut;
 out vec2 vertexTextureCoordOut;
 out vec4 diffuse;
 out vec4 specular;
+out vec4 ambient;
 
 void main()
 {
@@ -38,6 +41,9 @@ void main()
 	vec4 worldPosition = modelMatrix * vec4(vertexPosition, 1.0f);
 
 	vec3 viewDirection = normalize(cameraPosition - worldPosition.xyz);
+
+	// Calculate ambient
+	ambient = ambientMaterialColor * ambientLightColor;
 
 	// Calculate diffuse lighting
 	float nDotL = clamp(dot(worldNormals.xyz, lightDirection), 0, 1);

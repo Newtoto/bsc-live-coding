@@ -102,10 +102,12 @@ int main(int argc, char* args[])
 
 	// Lighting
 	vec3 lightDirection = vec3(0.0f, 0.0f, -1.0f);
+	vec4 ambientLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	vec4 diffuseLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	vec4 specularLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Material
+	vec4 ambientMaterialColor = vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	vec4 diffuseMaterialColor = vec4(0.8f, 0.8f, 0.8f, 1.0f);
 	vec4 specualarMaterialColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -160,6 +162,11 @@ int main(int argc, char* args[])
 	{
 		printf("Unable to find %s uniform", "lightDirection");
 	}
+	GLint ambientLightColorLocation = glGetUniformLocation(programID, "ambientLightColor");
+	if (ambientLightColorLocation < 0)
+	{
+		printf("Unable to find %s uniform", "ambientLightColor");
+	}
 	GLint diffuseLightColorLocation = glGetUniformLocation(programID, "diffuseLightColor");
 	if (diffuseLightColorLocation < 0)
 	{
@@ -177,6 +184,11 @@ int main(int argc, char* args[])
 	}
 
 	// Material
+	GLint ambientMaterialColorLocation = glGetUniformLocation(programID, "ambientMaterialColor");
+	if (ambientMaterialColorLocation < 0)
+	{
+		printf("Unable to find %s uniform", "ambientMaterialColor");
+	}
 	GLint diffuseMaterialColorLocation = glGetUniformLocation(programID, "diffuseMaterialColor");
 	if (diffuseLightColorLocation < 0)
 	{
@@ -319,11 +331,13 @@ int main(int argc, char* args[])
 
 		// Lighting
 		glUniform3fv(lightDirectionLocation, 1, value_ptr(lightDirection));
+		glUniform4fv(ambientLightColorLocation, 1, value_ptr(ambientLightColor));
 		glUniform4fv(diffuseLightColorLocation, 1, value_ptr(diffuseLightColor));
 		glUniform4fv(specularLightColorLocation, 1, value_ptr(specularLightColor));
 		glUniform1f(specularPowerLocation, specularPower);
 
 		// Material
+		glUniform4fv(ambientMaterialColorLocation, 1, value_ptr(ambientMaterialColor));
 		glUniform4fv(diffuseMaterialColorLocation, 1, value_ptr(diffuseMaterialColor));
 		glUniform4fv(specularMaterialColorLocation, 1, value_ptr(specularLightColor));
 		
