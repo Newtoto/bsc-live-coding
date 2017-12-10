@@ -8,3 +8,4 @@
 
 GLuint loadTextureFromFile(const std::string& filename);
 
+GLuint createTexture(int width, int height);

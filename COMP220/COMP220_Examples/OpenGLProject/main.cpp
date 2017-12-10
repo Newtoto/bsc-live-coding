@@ -105,13 +105,61 @@ int main(int argc, char* args[])
 	vec4 ambientLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	vec4 diffuseLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	vec4 specularLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	float specularPower = 25.0f;
 
 	// Material
 	vec4 ambientMaterialColor = vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	vec4 diffuseMaterialColor = vec4(0.8f, 0.8f, 0.8f, 1.0f);
 	vec4 specualarMaterialColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	float specularPower = 25.0f;
+	// Color buffer texture
+	GLuint colorBufferID = createTexture(windowWidth, windowHeight);
+
+	// Create depth buffer
+	GLuint depthRenderBufferID;
+	glGenRenderbuffers(1, &depthRenderBufferID);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBufferID);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, windowWidth, windowHeight);
+
+	// Create frame buffer
+	GLuint frameBufferID;
+	glGenFramebuffers(1, &frameBufferID);
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBufferID);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, colorBufferID, 0);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Unable to create frame buffer for post processing", "Frame buffer error", NULL);
+	}
+
+	// Create sceen aligned quad
+	GLfloat screenVerts[] =
+	{
+		-1, -1,
+		1, -1,
+		-1, 1,
+		1, 1
+	};
+
+	GLuint screenQuadVBOID;
+	glGenBuffers(1, &screenQuadVBOID);
+	glBindBuffer(GL_ARRAY_BUFFER, screenQuadVBOID);
+	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), screenVerts, GL_STATIC_DRAW);
+
+	GLuint screenVAO;
+	glGenVertexArrays(1, &screenVAO);
+	glBindVertexArray(screenVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, screenQuadVBOID);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	GLuint postProcessingProgramID = LoadShaders("passThroughVert.glsl", "postTextureFrag.glsl");
+	GLint texture0Location = glGetUniformLocation(postProcessingProgramID, "texture0");
+	if (texture0Location < 0)
+	{
+		printf("Unable to find %s uniform", "texture0");
+	}
 
 	//Create and compile GLSL program from shaders
 	GLuint programID = LoadShaders("lightingVert.glsl", "lightingFrag.glsl");
@@ -310,6 +358,9 @@ int main(int argc, char* args[])
 		//Recalculate object position
 		tank.update();
 
+		glEnable(GL_DEPTH_TEST);
+		glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+
 		// Clear the screen
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClearDepth(1.0f);
@@ -345,6 +396,22 @@ int main(int argc, char* args[])
 		//Draw the triangle
 		tank.draw();
 
+		glDisable(GL_DEPTH_TEST);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Bind post processing shaders
+		glUseProgram(postProcessingProgramID);
+		
+		// Activate texture unit 0 for the color buffer
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, colorBufferID);
+		glUniform1i(texture0Location, 0);
+
+		glBindVertexArray(screenVAO);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
 		SDL_GL_SwapWindow(window);
 
 		lastTicks = currentTicks;
@@ -366,6 +433,16 @@ int main(int argc, char* args[])
 	//delete collisionConfiguration;
 
 	tank.destroy();
+
+	// Delete post processing from memory
+	glDeleteProgram(postProcessingProgramID);
+	glDeleteVertexArrays(1, &screenVAO);
+	glDeleteBuffers(1, &screenQuadVBOID);
+	glDeleteFramebuffers(1, &frameBufferID);
+	glDeleteRenderbuffers(1, &depthRenderBufferID);
+	glDeleteTextures(1, &colorBufferID);
+	
+	// Add to gameobject class
 	glDeleteProgram(programID);
 
 	SDL_GL_DeleteContext(glContext);

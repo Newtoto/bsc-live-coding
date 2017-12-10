@@ -61,5 +61,7 @@
     <None Include="cube.nff" />
     <None Include="lightingFrag.glsl" />
     <None Include="lightingVert.glsl" />
+    <None Include="postTextureFrag.glsl" />
+    <None Include="passThroughVert.glsl" />
   </ItemGroup>
 </Project>
