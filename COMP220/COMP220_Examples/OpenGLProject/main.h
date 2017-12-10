@@ -12,13 +12,13 @@
 #include <glm\gtx\transform.hpp>
 #include <glm\gtc\type_ptr.hpp>
 
+#include <btBulletDynamicsCommon.h>
+
 #include "Vertex.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "Model.h"
 #include "GameObject.h"
-
-//#include "btBulletDynamicsCommon.h"
 
 void loadImageSupport();
 void requestCoreOpenGL(int majVer, int minVer);

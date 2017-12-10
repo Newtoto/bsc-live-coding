@@ -13,6 +13,8 @@
 #include <glm\gtx\transform.hpp>
 #include <glm\gtc\type_ptr.hpp>
 
+#include <btBulletDynamicsCommon.h>
+
 #include "Vertex.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -26,6 +28,7 @@ public:
 	~GameObject();
 
 	void init();
+	void createRigidBody();
 	void draw();
 	void update();
 	void destroy();
@@ -40,9 +43,18 @@ public:
 
 	glm::mat4 modelMatrix;
 
+	btRigidBody* objectRigidBody;
+
+
 private:
 	glm::mat4 rotationMatrix;
 	glm::mat4 scaleMatrix;
 	glm::mat4 translationMatrix;
+
+	// Bullet physics
+	btTransform objectTransform;
+	btCollisionShape* objectColShape;
+	btVector3 objectOrigin;
+	btQuaternion objectPhysicsRotation;
 };
 

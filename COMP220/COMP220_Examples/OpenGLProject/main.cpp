@@ -248,43 +248,53 @@ int main(int argc, char* args[])
 		printf("Unable to find %s uniform", "specularMaterialColor");
 	}
 
+	///-----bullet initialization_start-----
+
+	///collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
+	btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+
+	///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
+	btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
+
+	///btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
+	btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
+
+	///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
+	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+
+	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
+
+	dynamicsWorld->setGravity(btVector3(0, -10, 0));
+
+	///-----bullet initialization_end-----
+
+	// Creating ground with bullet
+	btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(2.), btScalar(50.)));
+
+	btTransform groundTransform;
+	groundTransform.setIdentity();
+	groundTransform.setOrigin(btVector3(0, -10, 0));
+
+	btScalar mass(0.);
+	btVector3 localInertia(0, 0, 0);
+
+	//using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
+	btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
+	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, groundShape, localInertia);
+	btRigidBody* groundRigidBody = new btRigidBody(rbInfo);
+
+	//add the body to the dynamics world
+	dynamicsWorld->addRigidBody(groundRigidBody);
+
+	// Create tank colision
+	tank.createRigidBody();
+	dynamicsWorld->addRigidBody(tank.objectRigidBody);
+
 	glEnable(GL_DEPTH_TEST);
 	int lastTicks = SDL_GetTicks();
 	int currentTicks = SDL_GetTicks();
 
-	//// BULLET PHYSICS
-	/////collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
-	//btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
 
-	/////use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
-	//btCollisionDispatcher* dispatcher = new	btCollisionDispatcher(collisionConfiguration);
-
-	/////btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
-	//btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
-
-	/////the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
-	//btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
-
-	//btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
-
-	//dynamicsWorld->setGravity(btVector3(0, -10, 0));
-
-	//btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(1.), btScalar(50.)));
-
-	//btTransform groundTransform;
-	//groundTransform.setIdentity();
-	//groundTransform.setOrigin(btVector3(0, -56, 0));
-
-	//btScalar mass(0.);
-	//btVector3 localInertia(0, 0, 0);
-
-	////using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
-	//btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
-	//btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, groundShape, localInertia);
-	//btRigidBody* groundBody = new btRigidBody(rbInfo);
-
-	////add the body to the dynamics world
-	//dynamicsWorld->addRigidBody(groundBody);
 
 	SDL_WarpMouseInWindow(window, windowWidth / 2, windowHeight / 2);
 
@@ -338,6 +348,9 @@ int main(int argc, char* args[])
 		currentTicks = SDL_GetTicks();
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
 
+		dynamicsWorld->stepSimulation(1.f / 60.f, 10);
+		
+
 		// Get mouse movement
 		int mouseX, mouseY;
 		SDL_GetMouseState(&mouseX, &mouseY);
@@ -348,7 +361,7 @@ int main(int argc, char* args[])
 		// Move camera based on mouse movement
 		horizontalAngle += mouseSensitivity * float(windowWidth / 2 - mouseX);
 		verticalAngle += mouseSensitivity * float(windowHeight / 2 - mouseY);
-		verticalAngle = clamp(verticalAngle, -0.3f, 0.7f);
+		verticalAngle = clamp(verticalAngle, -0.5f, 0.7f);
 		printf("%", verticalAngle);
 		vec3 direction(cos(verticalAngle) * sin(horizontalAngle), sin(verticalAngle), cos(verticalAngle) * cos(horizontalAngle));
 
@@ -416,23 +429,31 @@ int main(int argc, char* args[])
 
 		lastTicks = currentTicks;
 	}
-
-	////Delete content
-	////delete dynamics world
-	//delete dynamicsWorld;
-
-	////delete solver
-	//delete solver;
-
-	////delete broadphase
-	//delete overlappingPairCache;
-
-	////delete dispatcher
-	//delete dispatcher;
-
-	//delete collisionConfiguration;
-
+	
+	// Destroy models
+	dynamicsWorld->removeRigidBody(tank.objectRigidBody);
 	tank.destroy();
+
+	dynamicsWorld->removeRigidBody(groundRigidBody);
+	// Delete ground
+	delete groundShape;
+	delete groundRigidBody->getMotionState();
+	delete groundRigidBody;
+
+	// Delete bullet content
+	//delete dynamics world
+	delete dynamicsWorld;
+
+	//delete solver
+	delete solver;
+
+	//delete broadphase
+	delete overlappingPairCache;
+
+	//delete dispatcher
+	delete dispatcher;
+
+	delete collisionConfiguration;
 
 	// Delete post processing from memory
 	glDeleteProgram(postProcessingProgramID);

@@ -22,6 +22,24 @@ void GameObject::init()
 	textureID = loadTextureFromFile("Tank1DF.png");
 }
 
+void GameObject::createRigidBody()
+{
+	// Create colision
+	objectColShape = new btBoxShape(btVector3(2, 2, 2));
+	// Create Dynamic Objects
+	objectTransform.setIdentity();
+	objectTransform.setOrigin(btVector3(objectPosition.x, objectPosition.y, objectPosition.z));
+	btVector3 objectInertia(0, 0, 0);
+
+	btScalar objectMass(1.f);
+
+	objectColShape->calculateLocalInertia(objectMass, objectInertia);
+
+	btDefaultMotionState* myMotionState = new btDefaultMotionState(objectTransform);
+	btRigidBody::btRigidBodyConstructionInfo rbInfo(objectMass, myMotionState, objectColShape, objectInertia);
+	objectRigidBody = new btRigidBody(rbInfo);
+}
+
 void GameObject::draw()
 {
 	for (Mesh *currentMesh : meshes)
@@ -32,6 +50,16 @@ void GameObject::draw()
 
 void GameObject::update()
 {
+	if (objectRigidBody)
+	{
+		// Update physics
+		objectTransform = objectRigidBody->getWorldTransform();
+		objectOrigin = objectTransform.getOrigin();
+		objectPhysicsRotation = objectTransform.getRotation();
+
+		objectPosition = glm::vec3(objectOrigin.getX(), objectOrigin.getY(), objectOrigin.getZ());
+	}
+
 	rotationMatrix = rotate(objectRotation.x, glm::vec3(1.0f, 0.0f, 0.0f))*rotate(objectRotation.y, glm::vec3(0.0f, 1.0f, 0.0f))*rotate(objectRotation.z, glm::vec3(1.0f, 0.0f, 1.0f));
 	scaleMatrix = scale(objectScale);
 	translationMatrix = translate(objectPosition);
@@ -41,6 +69,12 @@ void GameObject::update()
 
 void GameObject::destroy()
 {
+	// Delete rigid body
+	delete objectColShape;
+	delete objectRigidBody->getMotionState();
+	delete objectRigidBody;
+
+	// Delete meshes
 	auto iter = meshes.begin();
 	while (iter != meshes.end())
 	{
