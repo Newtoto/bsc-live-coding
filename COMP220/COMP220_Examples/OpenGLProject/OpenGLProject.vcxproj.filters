@@ -63,5 +63,6 @@
     <None Include="lightingVert.glsl" />
     <None Include="postTextureFrag.glsl" />
     <None Include="passThroughVert.glsl" />
+    <None Include="postBlackAndwhite.glsl" />
   </ItemGroup>
 </Project>
