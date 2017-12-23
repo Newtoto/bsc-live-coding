@@ -14,7 +14,7 @@ Camera::Camera()
 	verticalAngle = 0.0f;
 	fieldOfView = 45.0f;
 
-	cameraSpeed = 2.0f;
+	cameraSpeed = 0.2f;
 	mouseSensitivity = 0.01;
 
 	projectionMatrix = glm::perspective(glm::radians(90.0f), float(4 / 3), 0.1f, 100.0f);
@@ -45,13 +45,13 @@ void Camera::forward(float magnitude)
 {
 	glm::vec3 direction(cos(verticalAngle) * sin(horizontalAngle), sin(verticalAngle), cos(verticalAngle) * cos(horizontalAngle));
 
-	cameraPosition += direction * glm::vec3(magnitude, 0.0f, magnitude);
+	cameraPosition += direction * glm::vec3(magnitude * cameraSpeed, 0.0f, magnitude * cameraSpeed);
 }
 
 void Camera::sideways(float magnitude)
 {
 	glm::vec3 direction(cos(verticalAngle) * sin(horizontalAngle), sin(verticalAngle), cos(verticalAngle) * cos(horizontalAngle));
 
-	cameraPosition.x += direction.z * magnitude;
-	cameraPosition.z -= direction.x * magnitude;
+	cameraPosition.x += direction.z * magnitude * cameraSpeed;
+	cameraPosition.z -= direction.x * magnitude * cameraSpeed;
 }

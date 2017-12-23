@@ -298,8 +298,11 @@ int main(int argc, char* args[])
 
 	SDL_WarpMouseInWindow(window, windowWidth / 2, windowHeight / 2);
 
+	InputManager inputs;
+
 	//Event loop, we will loop until running is set to false, usually if escape has been pressed or window is closed
 	bool running = true;
+
 	//SDL Event structure, this will be checked in the while loop
 	SDL_Event ev;
 
@@ -326,33 +329,93 @@ int main(int argc, char* args[])
 					running = false;
 					break;
 
+				// Change input manager value if key is pressed
 				case SDLK_UP:
+					inputs.mouseSensitivityUp = 1;
 					playerCamera.mouseSensitivity += 0.001;
 					break;
 
 				case SDLK_DOWN:
+					inputs.mouseSensitivityUp = -1;
 					if (playerCamera.mouseSensitivity > 0.001) {
 						playerCamera.mouseSensitivity -= 0.001;
 					}
 					break;
 
 				case SDLK_w:
-					playerCamera.forward(1.0f);
+					inputs.forward = 1;
+					//playerCamera.forward(1.0f);
 					break;
 
 				case SDLK_a:
-					playerCamera.sideways(1.0f);
+					inputs.sideways = 1;
+					//playerCamera.sideways(1.0f);
 					break;
 
 				case SDLK_s:
-					playerCamera.forward(-1.0f);
+					inputs.forward = -1;
+					//playerCamera.forward(-1.0f);
 					break;
 
 				case SDLK_d:
-					playerCamera.sideways(-1.0f);
+					inputs.sideways = -1;
+					//playerCamera.sideways(-1.0f);
 					break;
 				};
+			// Change input manager value if key is released
+			case SDL_KEYUP:
+				//Check the actual key code of the key that has been pressed
+				switch (ev.key.keysym.sym)
+				{
+				case SDLK_UP:
+					inputs.ZeroValue(inputs.mouseSensitivityUp, 1);
+					break;
+
+				case SDLK_DOWN:
+					inputs.ZeroValue(inputs.mouseSensitivityUp, 1);
+					break;
+
+				case SDLK_w:
+					inputs.ZeroValue(inputs.forward, 1);
+					break;
+
+				case SDLK_a:
+					inputs.ZeroValue(inputs.sideways, 1);
+					break;
+
+				case SDLK_s:
+					inputs.ZeroValue(inputs.forward, -1);
+					break;
+
+				case SDLK_d:
+					inputs.ZeroValue(inputs.sideways, -1);
+					break;
+				}
 			}
+		}
+
+		// Run through inputs
+		// Forward and backward movement
+		if (inputs.forward == 1)
+		{
+			// Move forward
+			playerCamera.forward(1.0f);
+		}
+		else if (inputs.forward == -1)
+		{
+			// Move backwards
+			playerCamera.forward(-1.0f);
+		}
+		// Sideways movement
+		if (inputs.sideways == 1)
+		{
+			// Move right
+			playerCamera.sideways(1.0f);
+		}
+		else if (inputs.sideways == -1)
+		{
+			// Move left
+			playerCamera.sideways(-1.0f);
 		}
 
 		currentTicks = SDL_GetTicks();
