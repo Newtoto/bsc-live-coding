@@ -82,8 +82,9 @@ int main(int argc, char* args[])
 	GameObject tank(vec3(10.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f));
 	tank.update();
 
-	// default camera position
-	vec3 cameraPosition = vec3(0.0f, 2.0f, -5.0f);
+	// Add camera
+	Camera playerCamera;
+	/*vec3 cameraPosition = vec3(0.0f, 2.0f, -5.0f);
 	vec3 cameraTarget = vec3(0.0f, 0.0f, 0.0f);
 	vec3 cameraUp = vec3(0.0f, 1.0f, 0.0f);
 
@@ -97,7 +98,7 @@ int main(int argc, char* args[])
 	float cameraSpeed = 2.0f;
 	float mouseSensitivity = 0.01;
 
-	mat4 projectionMatrix = perspective(radians(90.0f), float(4 / 3), 0.1f, 100.0f);
+	mat4 projectionMatrix = perspective(radians(90.0f), float(4 / 3), 0.1f, 100.0f);*/
 
 	// Lighting
 	vec3 lightDirection = vec3(0.0f, 0.0f, -1.0f);
@@ -326,29 +327,29 @@ int main(int argc, char* args[])
 					break;
 
 				case SDLK_UP:
-					mouseSensitivity += 0.001;
+					playerCamera.mouseSensitivity += 0.001;
 					break;
 
 				case SDLK_DOWN:
-					if (mouseSensitivity > 0.001) {
-						mouseSensitivity -= 0.001;
+					if (playerCamera.mouseSensitivity > 0.001) {
+						playerCamera.mouseSensitivity -= 0.001;
 					}
 					break;
 
 				case SDLK_w:
-					cameraPosition.z += 0.1;
+					playerCamera.cameraPosition.z += 0.1;
 					break;
 
 				case SDLK_a:
-					cameraPosition.x += 0.1;
+					playerCamera.cameraPosition.x += 0.1;
 					break;
 
 				case SDLK_s:
-					cameraPosition.z -= 0.1;
+					playerCamera.cameraPosition.z -= 0.1;
 					break;
 
 				case SDLK_d:
-					cameraPosition.x -= 0.1;
+					playerCamera.cameraPosition.x -= 0.1;
 					break;
 				};
 			}
@@ -360,22 +361,11 @@ int main(int argc, char* args[])
 		dynamicsWorld->stepSimulation(1.f / 60.f, 10);
 		
 
-		// Get mouse movement
-		int mouseX, mouseY;
-		SDL_GetMouseState(&mouseX, &mouseY);
-
 		// Snap mouse to center
 		SDL_WarpMouseInWindow(window, windowWidth / 2, windowHeight / 2);
 
 		// Move camera based on mouse movement
-		horizontalAngle += mouseSensitivity * float(windowWidth / 2 - mouseX);
-		verticalAngle += mouseSensitivity * float(windowHeight / 2 - mouseY);
-		verticalAngle = clamp(verticalAngle, -0.5f, 0.7f);
-		printf("%", verticalAngle);
-		vec3 direction(cos(verticalAngle) * sin(horizontalAngle), sin(verticalAngle), cos(verticalAngle) * cos(horizontalAngle));
-
-		//Recalculate camera
-		viewMatrix = lookAt(cameraPosition, direction + cameraPosition, cameraUp);
+		playerCamera.update(windowWidth, windowHeight);
 
 		//Recalculate object position
 		tank.update();
@@ -396,10 +386,10 @@ int main(int argc, char* args[])
 		glUniform4fv(fragColorLocation, 1, fragColor);
 		glUniform1f(currentTimeLocation, (float)(currentTicks) / 1000.0f);
 		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(tank.modelMatrix));
-		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(viewMatrix));
-		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(projectionMatrix));
+		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.viewMatrix));
+		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.projectionMatrix));
 
-		glUniform3fv(cameraPositionLocation, 1, value_ptr(cameraPosition));
+		glUniform3fv(cameraPositionLocation, 1, value_ptr(playerCamera.cameraPosition));
 		glUniform1i(textureLocation, 0);
 
 		// Lighting
