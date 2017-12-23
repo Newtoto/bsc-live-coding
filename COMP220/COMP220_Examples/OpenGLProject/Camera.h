@@ -13,7 +13,7 @@ public:
 	class Camera();
 	~Camera();
 
-	void update(float windowWidth, float windowHeight);
+	void moveView(float windowWidth, float windowHeight);
 
 	glm::vec3 cameraPosition;
 	float mouseSensitivity;

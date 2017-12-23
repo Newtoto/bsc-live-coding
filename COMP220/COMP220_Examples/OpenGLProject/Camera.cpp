@@ -25,7 +25,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::update(float windowWidth, float windowHeight)
+void Camera::moveView(float windowWidth, float windowHeight)
 {
 	// Get mouse movement
 	int mouseX, mouseY;

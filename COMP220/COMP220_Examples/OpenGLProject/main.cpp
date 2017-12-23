@@ -365,7 +365,7 @@ int main(int argc, char* args[])
 		SDL_WarpMouseInWindow(window, windowWidth / 2, windowHeight / 2);
 
 		// Move camera based on mouse movement
-		playerCamera.update(windowWidth, windowHeight);
+		playerCamera.moveView(windowWidth, windowHeight);
 
 		//Recalculate object position
 		tank.update();
