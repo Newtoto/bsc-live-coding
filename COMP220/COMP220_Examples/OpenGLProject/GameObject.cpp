@@ -1,25 +1,17 @@
 #include "GameObject.h"
 
-GameObject::GameObject()
+GameObject::GameObject(glm::vec3 position, glm::vec3 scale, glm::vec3 rotation)
 {
-	objectPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-	objectScale = glm::vec3(1.0f, 1.0f, 1.0f);
-	objectRotation = glm::vec3(0.0f, 0.0f, 0.0f);
-}
-
-
-GameObject::~GameObject()
-{
-}
-
-void GameObject::init()
-{
-	objectPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-	objectScale = glm::vec3(1.0f, 1.0f, 1.0f);
-	objectRotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	objectPosition = position;
+	objectScale = scale;
+	objectRotation = rotation;
 
 	loadMeshFromFile("Tank1.FBX", meshes);
 	textureID = loadTextureFromFile("Tank1DF.png");
+}
+
+GameObject::~GameObject()
+{
 }
 
 void GameObject::createRigidBody()

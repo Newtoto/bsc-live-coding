@@ -24,10 +24,9 @@
 class GameObject
 {
 public:
-	class GameObject();
+	class GameObject(glm::vec3 position, glm::vec3 scale, glm::vec3 rotation);
 	~GameObject();
 
-	void init();
 	void createRigidBody();
 	void draw();
 	void update();

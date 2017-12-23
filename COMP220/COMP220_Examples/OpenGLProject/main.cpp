@@ -78,9 +78,8 @@ int main(int argc, char* args[])
 		quitSDL();
 	}
 
-	// Add first tank
-	GameObject tank;
-	tank.init();
+	// Add tanks
+	GameObject tank(vec3(10.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f));
 	tank.update();
 
 	// default camera position
@@ -327,19 +326,29 @@ int main(int argc, char* args[])
 					break;
 
 				case SDLK_UP:
-					cameraPosition.z += 0.1;
+					mouseSensitivity += 0.001;
 					break;
 
 				case SDLK_DOWN:
+					if (mouseSensitivity > 0.001) {
+						mouseSensitivity -= 0.001;
+					}
+					break;
+
+				case SDLK_w:
+					cameraPosition.z += 0.1;
+					break;
+
+				case SDLK_a:
+					cameraPosition.x += 0.1;
+					break;
+
+				case SDLK_s:
 					cameraPosition.z -= 0.1;
 					break;
 
-				case SDLK_RIGHT:
-					cameraTarget.x -= 0.1;
-					break;
-
-				case SDLK_LEFT:
-					cameraTarget.x += 0.1;
+				case SDLK_d:
+					cameraPosition.x -= 0.1;
 					break;
 				};
 			}

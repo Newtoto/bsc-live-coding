@@ -19,6 +19,7 @@
 #include "Texture.h"
 #include "Model.h"
 #include "GameObject.h"
+#include "Camera.h"
 
 void loadImageSupport();
 void requestCoreOpenGL(int majVer, int minVer);
