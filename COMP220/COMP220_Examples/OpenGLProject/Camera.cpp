@@ -40,3 +40,18 @@ void Camera::moveView(float windowWidth, float windowHeight)
 	//Recalculate camera
 	viewMatrix = lookAt(cameraPosition, direction + cameraPosition, cameraUp);
 }
+
+void Camera::forward(float magnitude)
+{
+	glm::vec3 direction(cos(verticalAngle) * sin(horizontalAngle), sin(verticalAngle), cos(verticalAngle) * cos(horizontalAngle));
+
+	cameraPosition += direction * glm::vec3(magnitude, 0.0f, magnitude);
+}
+
+void Camera::sideways(float magnitude)
+{
+	glm::vec3 direction(cos(verticalAngle) * sin(horizontalAngle), sin(verticalAngle), cos(verticalAngle) * cos(horizontalAngle));
+
+	cameraPosition.x += direction.z * magnitude;
+	cameraPosition.z -= direction.x * magnitude;
+}

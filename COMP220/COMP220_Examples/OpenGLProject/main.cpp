@@ -337,19 +337,19 @@ int main(int argc, char* args[])
 					break;
 
 				case SDLK_w:
-					playerCamera.cameraPosition.z += 0.1;
+					playerCamera.forward(1.0f);
 					break;
 
 				case SDLK_a:
-					playerCamera.cameraPosition.x += 0.1;
+					playerCamera.sideways(1.0f);
 					break;
 
 				case SDLK_s:
-					playerCamera.cameraPosition.z -= 0.1;
+					playerCamera.forward(-1.0f);
 					break;
 
 				case SDLK_d:
-					playerCamera.cameraPosition.x -= 0.1;
+					playerCamera.sideways(-1.0f);
 					break;
 				};
 			}
