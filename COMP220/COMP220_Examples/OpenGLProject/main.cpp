@@ -61,7 +61,7 @@ int InitialiseSDLWindowAndOpenGL(int windowWidth, int windowHeight) {
 	return 0;
 }
 
-void quitSDL() {
+void QuitSDL() {
 	// Clean up
 	SDL_GL_DeleteContext(glContext);
 	SDL_DestroyWindow(window);
@@ -77,7 +77,7 @@ int main(int argc, char* args[])
 	// Check SDL initialisation
 	if (InitialiseSDLWindowAndOpenGL(windowWidth, windowHeight) == 1) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, SDL_GetError(), "SDL and openGL failed to initialise", NULL);
-		quitSDL();
+		QuitSDL();
 	}
 
 	// Add tanks
