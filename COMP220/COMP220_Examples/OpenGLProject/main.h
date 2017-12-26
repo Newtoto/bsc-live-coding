@@ -25,11 +25,11 @@
 #include "Lighting.h"
 #include "Material.h"
 
-void loadImageSupport();
-void requestCoreOpenGL(int majVer, int minVer);
+void LoadImageSupport();
+void RequestCoreOpenGL(int majVer, int minVer);
 
-int initialiseSDLWindowAndOpenGL(int windowWidth, int windowHeight);
-void quitSDL();
+int InitialiseSDLWindowAndOpenGL(int windowWidth, int windowHeight);
+void QuitSDL();
 
 SDL_Window* window;
 SDL_GLContext glContext;

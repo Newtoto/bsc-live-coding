@@ -2,7 +2,7 @@
 
 #include "main.h"
 
-void loadImageSupport() {
+void LoadImageSupport() {
 	int flags = IMG_INIT_JPG | IMG_INIT_PNG;
 	int initted = IMG_Init(flags);
 	if ((initted&flags) != flags)
@@ -12,18 +12,18 @@ void loadImageSupport() {
 	}
 }
 
-void requestCoreOpenGL(int majorVersion, int minorVersion) {
+void RequestCoreOpenGL(int majorVersion, int minorVersion) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minorVersion);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 }
 
-int initialiseSDLWindowAndOpenGL(int windowWidth, int windowHeight) {
+int InitialiseSDLWindowAndOpenGL(int windowWidth, int windowHeight) {
 	// load support for JPG and PNG image formats (tiffs also supported, but not checked)
-	loadImageSupport();
+	LoadImageSupport();
 	//Request 3.1 core OpenGL
-	requestCoreOpenGL(3, 1);
+	RequestCoreOpenGL(3, 1);
 
 	//Initialises the SDL Library, passing in SDL_INIT_VIDEO to only initialise the video subsystems
 	//https://wiki.libsdl.org/SDL_Init
@@ -75,7 +75,7 @@ int main(int argc, char* args[])
 	int windowHeight = 800;
 
 	// Check SDL initialisation
-	if (initialiseSDLWindowAndOpenGL(windowWidth, windowHeight) == 1) {
+	if (InitialiseSDLWindowAndOpenGL(windowWidth, windowHeight) == 1) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, SDL_GetError(), "SDL and openGL failed to initialise", NULL);
 		quitSDL();
 	}
