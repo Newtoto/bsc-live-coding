@@ -380,11 +380,7 @@ int main(int argc, char* args[])
 		glUniform1i(textureLocation, 0);
 
 		// Lighting
-		glUniform3fv(light.lightDirectionLocation, 1, value_ptr(light.direction));
-		glUniform4fv(light.ambientLightColorLocation, 1, value_ptr(light.ambientColor));
-		glUniform4fv(light.diffuseLightColorLocation, 1, value_ptr(light.diffuseColor));
-		glUniform4fv(light.specularLightColorLocation, 1, value_ptr(light.specularColor));
-		glUniform1f(light.specularPowerLocation, light.specularPower);
+		light.AttatchUniformLocations(tank.programID);
 
 		// Material
 		glUniform4fv(ambientMaterialColorLocation, 1, value_ptr(ambientMaterialColor));

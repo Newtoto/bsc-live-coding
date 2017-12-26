@@ -45,13 +45,13 @@ void Lighting::InitialiseUniformLocations(GLuint programID) {
 	}
 }
 
-//void Lighting::AttatchUniformLocations(GLuint programID)
-//{
-//	glUseProgram(programID);
-//
-//	glUniform3fv(lightDirectionLocation, 1, value_ptr(direction));
-//	glUniform4fv(ambientLightColorLocation, 1, value_ptr(ambientColor));
-//	glUniform4fv(diffuseLightColorLocation, 1, value_ptr(diffuseColor));
-//	glUniform4fv(specularLightColorLocation, 1, value_ptr(specularColor));
-//	glUniform1f(specularPowerLocation, specularPower);
-//}
+void Lighting::AttatchUniformLocations(GLuint programID)
+{
+	glUseProgram(programID);
+
+	glUniform3fv(lightDirectionLocation, 1, value_ptr(direction));
+	glUniform4fv(ambientLightColorLocation, 1, value_ptr(ambientColor));
+	glUniform4fv(diffuseLightColorLocation, 1, value_ptr(diffuseColor));
+	glUniform4fv(specularLightColorLocation, 1, value_ptr(specularColor));
+	glUniform1f(specularPowerLocation, specularPower);
+}
