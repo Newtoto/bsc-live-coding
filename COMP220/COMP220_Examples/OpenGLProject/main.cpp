@@ -84,6 +84,10 @@ int main(int argc, char* args[])
 	GameObject tank(vec3(10.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f));
 	tank.Update();
 
+	// Second tank
+	GameObject secondTank(vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f));
+	secondTank.Update();
+
 	// Add camera
 	Camera playerCamera;
 
@@ -145,13 +149,17 @@ int main(int argc, char* args[])
 	//Create and compile GLSL program from shaders
 
 	tank.CreateUniformLocations();
+	secondTank.CreateUniformLocations();
+
 	static const GLfloat fragColor[] = { 0.0f, 1.0f, 0.0f, 1.0f };
 
 	// Lighting
 	light.InitialiseUniformLocations(tank.programID);
+	light.InitialiseUniformLocations(secondTank.programID);
 
 	// Material
 	material.InitialiseUniformLocations(tank.programID);
+	material.InitialiseUniformLocations(secondTank.programID);
 
 	///-----bullet initialization_start-----
 
@@ -191,9 +199,13 @@ int main(int argc, char* args[])
 	//add the body to the dynamics world
 	dynamicsWorld->addRigidBody(groundRigidBody);
 
-	// Create tank colision
+	// Create tank collision
 	tank.CreateRigidBody();
 	dynamicsWorld->addRigidBody(tank.objectRigidBody);
+
+	// Second tank collision
+	secondTank.CreateRigidBody();
+	dynamicsWorld->addRigidBody(secondTank.objectRigidBody);
 
 	glEnable(GL_DEPTH_TEST);
 	int lastTicks = SDL_GetTicks();
@@ -303,6 +315,7 @@ int main(int argc, char* args[])
 
 		//Recalculate object position
 		tank.Update();
+		secondTank.Update();
 
 		glEnable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
@@ -325,9 +338,25 @@ int main(int argc, char* args[])
 		// Material
 		material.UseUniformLocations(tank.programID, light);
 		
-
 		//Draw the triangle
 		tank.Draw();
+
+		// Second tank
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, secondTank.textureID);
+
+		glUseProgram(secondTank.programID);
+		glUniform4fv(secondTank.fragColorLocation, 1, fragColor);
+		tank.UseUniformLocations(currentTicks, playerCamera);
+
+		// Lighting
+		light.UseUniformLocations(secondTank.programID);
+
+		// Material
+		material.UseUniformLocations(secondTank.programID, light);
+
+		//Draw the triangle
+		secondTank.Draw();
 
 		glDisable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -353,6 +382,9 @@ int main(int argc, char* args[])
 	// Destroy models
 	dynamicsWorld->removeRigidBody(tank.objectRigidBody);
 	tank.Destroy();
+
+	dynamicsWorld->removeRigidBody(secondTank.objectRigidBody);
+	secondTank.Destroy();
 
 	dynamicsWorld->removeRigidBody(groundRigidBody);
 	// Delete ground
