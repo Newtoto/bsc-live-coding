@@ -13,6 +13,6 @@
 #include "Vertex.h"
 #include "Mesh.h"
 
-bool loadModelFromFile(const std::string& filename, GLuint VBO, GLuint EBO, unsigned int& numberOfVerts, unsigned int& numberOfIndices);
+bool LoadModelFromFile(const std::string& filename, GLuint VBO, GLuint EBO, unsigned int& numberOfVerts, unsigned int& numberOfIndices);
 
-bool loadMeshFromFile(const std::string& filename, std::vector<Mesh*>& meshes);
+bool LoadMeshFromFile(const std::string& filename, std::vector<Mesh*>& meshes);

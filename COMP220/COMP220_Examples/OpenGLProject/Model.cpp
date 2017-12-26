@@ -1,6 +1,6 @@
 #include "Model.h"
 
-bool loadModelFromFile(const std::string& filename, GLuint VBO, GLuint EBO, unsigned int& numberOfVerts, unsigned int& numberOfIndices)
+bool LoadModelFromFile(const std::string& filename, GLuint VBO, GLuint EBO, unsigned int& numberOfVerts, unsigned int& numberOfIndices)
 {
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
@@ -69,7 +69,7 @@ bool loadModelFromFile(const std::string& filename, GLuint VBO, GLuint EBO, unsi
 	return true;
 }
 
-bool loadMeshFromFile(const std::string & filename, std::vector<Mesh*>& meshes)
+bool LoadMeshFromFile(const std::string & filename, std::vector<Mesh*>& meshes)
 {
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
@@ -88,7 +88,7 @@ bool loadMeshFromFile(const std::string & filename, std::vector<Mesh*>& meshes)
 	{
 		const aiMesh *currentAIMesh = scene->mMeshes[m];
 		Mesh *ourCurrentMesh = new Mesh();
-		ourCurrentMesh->init();
+		ourCurrentMesh->Init();
 
 		for (unsigned int v = 0; v < currentAIMesh->mNumVertices; v++)
 		{
@@ -131,7 +131,7 @@ bool loadMeshFromFile(const std::string & filename, std::vector<Mesh*>& meshes)
 			indices.push_back(currentFace.mIndices[2]);
 		}
 
-		ourCurrentMesh->copyMeshData(vertices.data(), vertices.size(), indices.data(), indices.size());
+		ourCurrentMesh->CopyMeshData(vertices.data(), vertices.size(), indices.data(), indices.size());
 		meshes.push_back(ourCurrentMesh);
 
 		vertices.clear();

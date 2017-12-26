@@ -14,7 +14,7 @@ Mesh::~Mesh()
 {
 }
 
-void Mesh::init()
+void Mesh::Init()
 {
 	glGenVertexArrays(1, &m_VAO);
 	glBindVertexArray(m_VAO);
@@ -26,7 +26,7 @@ void Mesh::init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
 }
 
-void Mesh::copyMeshData(Vertex * pVerts, unsigned int numberOfVerts, unsigned int * pIndices, unsigned int numberOfIndices)
+void Mesh::CopyMeshData(Vertex * pVerts, unsigned int numberOfVerts, unsigned int * pIndices, unsigned int numberOfIndices)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBufferData(GL_ARRAY_BUFFER, numberOfVerts * sizeof(Vertex), pVerts, GL_STATIC_DRAW);
@@ -58,14 +58,14 @@ void Mesh::copyMeshData(Vertex * pVerts, unsigned int numberOfVerts, unsigned in
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(9 * sizeof(float)));
 }
 
-void Mesh::destroy()
+void Mesh::Destroy()
 {
 	glDeleteVertexArrays(1, &m_VAO);
 	glDeleteBuffers(1, &m_VBO);
 	glDeleteBuffers(1, &m_EBO);
 }
 
-void Mesh::render()
+void Mesh::Render()
 {
 	glBindVertexArray(m_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);

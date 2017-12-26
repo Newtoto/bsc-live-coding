@@ -13,12 +13,12 @@ public:
 	Mesh();
 	~Mesh();
 
-	void copyMeshData(Vertex * pVerts, unsigned int numberOfVerts, unsigned int * pIndices, unsigned int numberOfIndices);
+	void CopyMeshData(Vertex * pVerts, unsigned int numberOfVerts, unsigned int * pIndices, unsigned int numberOfIndices);
 
-	void init();
-	void destroy();
+	void Init();
+	void Destroy();
 
-	void render();
+	void Render();
 
 private:
 	GLuint m_VBO;

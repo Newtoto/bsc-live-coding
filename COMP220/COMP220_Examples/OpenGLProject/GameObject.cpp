@@ -6,7 +6,7 @@ GameObject::GameObject(glm::vec3 position, glm::vec3 scale, glm::vec3 rotation)
 	objectScale = scale;
 	objectRotation = rotation;
 
-	loadMeshFromFile("Tank1.FBX", meshes);
+	LoadMeshFromFile("Tank1.FBX", meshes);
 	textureID = loadTextureFromFile("Tank1DF.png");
 
 	programID = LoadShaders("lightingVert.glsl", "lightingFrag.glsl");
@@ -38,7 +38,7 @@ void GameObject::Draw()
 {
 	for (Mesh *currentMesh : meshes)
 	{
-		currentMesh->render();
+		currentMesh->Render();
 	}
 }
 
