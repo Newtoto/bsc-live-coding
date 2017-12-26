@@ -154,7 +154,7 @@ int main(int argc, char* args[])
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	GLuint postProcessingProgramID = LoadShaders("passThroughVert.glsl", "postBlackAndwhite.glsl");
+	GLuint postProcessingProgramID = LoadShaders("passThroughVert.glsl", "postTextureFrag.glsl");
 	GLint texture0Location = glGetUniformLocation(postProcessingProgramID, "texture0");
 	if (texture0Location < 0)
 	{
@@ -334,22 +334,18 @@ int main(int argc, char* args[])
 
 				case SDLK_w:
 					forward.SetPositive();
-					//playerCamera.forward(1.0f);
 					break;
 
 				case SDLK_a:
 					sideways.SetPositive();
-					//playerCamera.sideways(1.0f);
 					break;
 
 				case SDLK_s:
 					forward.SetNegative();
-					//playerCamera.forward(-1.0f);
 					break;
 
 				case SDLK_d:
 					sideways.SetNegative();
-					//playerCamera.sideways(-1.0f);
 					break;
 
 				default:
