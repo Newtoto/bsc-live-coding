@@ -298,7 +298,8 @@ int main(int argc, char* args[])
 
 	SDL_WarpMouseInWindow(window, windowWidth / 2, windowHeight / 2);
 
-	InputManager inputs;
+	Input forward;
+	Input sideways;
 
 	//Event loop, we will loop until running is set to false, usually if escape has been pressed or window is closed
 	bool running = true;
@@ -331,34 +332,34 @@ int main(int argc, char* args[])
 
 				// Change input manager value if key is pressed
 				case SDLK_UP:
-					inputs.mouseSensitivityUp = 1;
+					// Increase mouse sensitivity
 					playerCamera.mouseSensitivity += 0.001;
 					break;
 
 				case SDLK_DOWN:
-					inputs.mouseSensitivityUp = -1;
+					// Decrease mouse sensitivity
 					if (playerCamera.mouseSensitivity > 0.001) {
 						playerCamera.mouseSensitivity -= 0.001;
 					}
 					break;
 
 				case SDLK_w:
-					inputs.forward = 1;
+					forward.SetPositive();
 					//playerCamera.forward(1.0f);
 					break;
 
 				case SDLK_a:
-					inputs.sideways = 1;
+					sideways.SetPositive();
 					//playerCamera.sideways(1.0f);
 					break;
 
 				case SDLK_s:
-					inputs.forward = -1;
+					forward.SetNegative();
 					//playerCamera.forward(-1.0f);
 					break;
 
 				case SDLK_d:
-					inputs.sideways = -1;
+					sideways.SetNegative();
 					//playerCamera.sideways(-1.0f);
 					break;
 				};
@@ -368,27 +369,29 @@ int main(int argc, char* args[])
 				switch (ev.key.keysym.sym)
 				{
 				case SDLK_UP:
-					inputs.ZeroValue(inputs.mouseSensitivityUp, 1);
+					// TODO Mouse sensitivity input
+					//inputs.ZeroValue(inputs.mouseSensitivityUp, 1);
 					break;
 
 				case SDLK_DOWN:
-					inputs.ZeroValue(inputs.mouseSensitivityUp, 1);
+					// TODO Mouse sensitivity input
+					//inputs.ZeroValue(inputs.mouseSensitivityUp, 1);
 					break;
 
 				case SDLK_w:
-					inputs.ZeroValue(inputs.forward, 1);
+					forward.ZeroPositive();
 					break;
 
 				case SDLK_a:
-					inputs.ZeroValue(inputs.sideways, 1);
+					sideways.ZeroPositive();
 					break;
 
 				case SDLK_s:
-					inputs.ZeroValue(inputs.forward, -1);
+					forward.ZeroNegative();
 					break;
 
 				case SDLK_d:
-					inputs.ZeroValue(inputs.sideways, -1);
+					sideways.ZeroNegative();
 					break;
 				}
 			}
@@ -396,26 +399,17 @@ int main(int argc, char* args[])
 
 		// Run through inputs
 		// Forward and backward movement
-		if (inputs.forward == 1)
+		if (forward.GetValue() != 0)
 		{
 			// Move forward
-			playerCamera.forward(1.0f);
+			playerCamera.forward(forward.GetValue());
 		}
-		else if (inputs.forward == -1)
-		{
-			// Move backwards
-			playerCamera.forward(-1.0f);
-		}
+
 		// Sideways movement
-		if (inputs.sideways == 1)
+		if (sideways.GetValue() != 0)
 		{
 			// Move right
-			playerCamera.sideways(1.0f);
-		}
-		else if (inputs.sideways == -1)
-		{
-			// Move left
-			playerCamera.sideways(-1.0f);
+			playerCamera.sideways(sideways.GetValue());
 		}
 
 		currentTicks = SDL_GetTicks();
