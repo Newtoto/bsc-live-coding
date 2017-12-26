@@ -89,11 +89,6 @@ int main(int argc, char* args[])
 
 	// Lighting
 	Lighting light;
-	/*vec3 lightDirection = vec3(0.0f, 0.0f, -1.0f);
-	vec4 ambientLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	vec4 diffuseLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	vec4 specularLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	float specularPower = 25.0f;*/
 
 	// Material
 	vec4 ambientMaterialColor = vec4(0.1f, 0.1f, 0.1f, 1.0f);
@@ -150,9 +145,8 @@ int main(int argc, char* args[])
 	}
 
 	//Create and compile GLSL program from shaders
-	GLuint programID = LoadShaders("lightingVert.glsl", "lightingFrag.glsl");
 
-	GLint fragColorLocation = glGetUniformLocation(programID, "fragColor");
+	GLint fragColorLocation = glGetUniformLocation(tank.programID, "fragColor");
 	if (fragColorLocation < 0) 
 	{
 		printf("Unable to find %s uniform", "fragColor");
@@ -160,77 +154,53 @@ int main(int argc, char* args[])
 
 	static const GLfloat fragColor[] = { 0.0f, 1.0f, 0.0f, 1.0f };
 
-	GLint currentTimeLocation = glGetUniformLocation(programID, "time");
+	GLint currentTimeLocation = glGetUniformLocation(tank.programID, "time");
 	if (currentTimeLocation < 0)
 	{
 		printf("Unable to find %s uniform", "time");
 	}
 
-	GLint modelMatrixLocation = glGetUniformLocation(programID, "modelMatrix");
+	GLint modelMatrixLocation = glGetUniformLocation(tank.programID, "modelMatrix");
 	if (modelMatrixLocation < 0)
 	{
 		printf("Unable to find %s uniform", "modelMatrix");
 	}
-	GLint viewMatrixLocation = glGetUniformLocation(programID, "viewMatrix");
+	GLint viewMatrixLocation = glGetUniformLocation(tank.programID, "viewMatrix");
 	if (viewMatrixLocation < 0)
 	{
 		printf("Unable to find %s uniform", "viewMatrix");
 	}
-	GLint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
+	GLint projectionMatrixLocation = glGetUniformLocation(tank.programID, "projectionMatrix");
 	if (projectionMatrixLocation < 0)
 	{
 		printf("Unable to find %s uniform", "projectionMatrix");
 	}
-	GLint textureLocation = glGetUniformLocation(programID, "baseTexture");
+	GLint textureLocation = glGetUniformLocation(tank.programID, "baseTexture");
 	if (textureLocation < 0)
 	{
 		printf("Unable to find %s uniform", "baseTexture");
 	}
-	GLint cameraPositionLocation = glGetUniformLocation(programID, "cameraPosition");
+	GLint cameraPositionLocation = glGetUniformLocation(tank.programID, "cameraPosition");
 	if (cameraPositionLocation < 0)
 	{
 		printf("Unable to find %s uniform", "cameraPosition");
 	}
 
 	// Lighting
-	GLint lightDirectionLocation = glGetUniformLocation(programID, "lightDirection");
-	if (lightDirectionLocation < 0)
-	{
-		printf("Unable to find %s uniform", "lightDirection");
-	}
-	GLint ambientLightColorLocation = glGetUniformLocation(programID, "ambientLightColor");
-	if (ambientLightColorLocation < 0)
-	{
-		printf("Unable to find %s uniform", "ambientLightColor");
-	}
-	GLint diffuseLightColorLocation = glGetUniformLocation(programID, "diffuseLightColor");
-	if (diffuseLightColorLocation < 0)
-	{
-		printf("Unable to find %s uniform", "diffuseLightColor");
-	}
-	GLint specularLightColorLocation = glGetUniformLocation(programID, "specularLightColor");
-	if (specularLightColorLocation < 0)
-	{
-		printf("Unable to find %s uniform", "specularLightColor");
-	}
-	GLint specularPowerLocation = glGetUniformLocation(programID, "specularPower");
-	if (specularPowerLocation < 0)
-	{
-		printf("Unable to find %s uniform", "specularMaterialPower");
-	}
+	light.InitialiseUniformLocations(tank.programID);
 
 	// Material
-	GLint ambientMaterialColorLocation = glGetUniformLocation(programID, "ambientMaterialColor");
+	GLint ambientMaterialColorLocation = glGetUniformLocation(tank.programID, "ambientMaterialColor");
 	if (ambientMaterialColorLocation < 0)
 	{
 		printf("Unable to find %s uniform", "ambientMaterialColor");
 	}
-	GLint diffuseMaterialColorLocation = glGetUniformLocation(programID, "diffuseMaterialColor");
-	if (diffuseLightColorLocation < 0)
+	GLint diffuseMaterialColorLocation = glGetUniformLocation(tank.programID, "diffuseMaterialColor");
+	if (diffuseMaterialColorLocation < 0)
 	{
 		printf("Unable to find %s uniform", "diffuseMaterialColor");
 	}
-	GLint specularMaterialColorLocation = glGetUniformLocation(programID, "specularMaterialColor");
+	GLint specularMaterialColorLocation = glGetUniformLocation(tank.programID, "specularMaterialColor");
 	if (specularMaterialColorLocation < 0)
 	{
 		printf("Unable to find %s uniform", "specularMaterialColor");
@@ -296,7 +266,7 @@ int main(int argc, char* args[])
 
 	while (running)
 	{
-		//Poll for the events which have happened in this frame
+		// Get keypresses
 		while (SDL_PollEvent(&event))
 		{
 			if (event.type == SDL_KEYDOWN)
@@ -398,7 +368,7 @@ int main(int argc, char* args[])
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, tank.textureID);
 
-		glUseProgram(programID);
+		glUseProgram(tank.programID);
 
 		glUniform4fv(fragColorLocation, 1, fragColor);
 		glUniform1f(currentTimeLocation, (float)(currentTicks) / 1000.0f);
@@ -410,11 +380,11 @@ int main(int argc, char* args[])
 		glUniform1i(textureLocation, 0);
 
 		// Lighting
-		glUniform3fv(lightDirectionLocation, 1, value_ptr(light.direction));
-		glUniform4fv(ambientLightColorLocation, 1, value_ptr(light.ambientColor));
-		glUniform4fv(diffuseLightColorLocation, 1, value_ptr(light.diffuseColor));
-		glUniform4fv(specularLightColorLocation, 1, value_ptr(light.specularColor));
-		glUniform1f(specularPowerLocation, light.specularPower);
+		glUniform3fv(light.lightDirectionLocation, 1, value_ptr(light.direction));
+		glUniform4fv(light.ambientLightColorLocation, 1, value_ptr(light.ambientColor));
+		glUniform4fv(light.diffuseLightColorLocation, 1, value_ptr(light.diffuseColor));
+		glUniform4fv(light.specularLightColorLocation, 1, value_ptr(light.specularColor));
+		glUniform1f(light.specularPowerLocation, light.specularPower);
 
 		// Material
 		glUniform4fv(ambientMaterialColorLocation, 1, value_ptr(ambientMaterialColor));
@@ -478,9 +448,6 @@ int main(int argc, char* args[])
 	glDeleteFramebuffers(1, &frameBufferID);
 	glDeleteRenderbuffers(1, &depthRenderBufferID);
 	glDeleteTextures(1, &colorBufferID);
-	
-	// Add to gameobject class
-	glDeleteProgram(programID);
 
 	SDL_GL_DeleteContext(glContext);
 	//Destroy the window and quit SDL2, NB we should do this after all cleanup in this order!!!

@@ -32,6 +32,8 @@ public:
 	void update();
 	void destroy();
 
+	GLuint programID;
+
 	glm::vec3 objectPosition;
 	glm::vec3 objectScale;
 	glm::vec3 objectRotation;

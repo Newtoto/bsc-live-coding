@@ -8,6 +8,8 @@ GameObject::GameObject(glm::vec3 position, glm::vec3 scale, glm::vec3 rotation)
 
 	loadMeshFromFile("Tank1.FBX", meshes);
 	textureID = loadTextureFromFile("Tank1DF.png");
+
+	programID = LoadShaders("lightingVert.glsl", "lightingFrag.glsl");
 }
 
 GameObject::~GameObject()
@@ -83,4 +85,5 @@ void GameObject::destroy()
 	meshes.clear();
 
 	glDeleteTextures(1, &textureID);
+	glDeleteProgram(programID);
 }
