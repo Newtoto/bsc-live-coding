@@ -84,21 +84,6 @@ int main(int argc, char* args[])
 
 	// Add camera
 	Camera playerCamera;
-	/*vec3 cameraPosition = vec3(0.0f, 2.0f, -5.0f);
-	vec3 cameraTarget = vec3(0.0f, 0.0f, 0.0f);
-	vec3 cameraUp = vec3(0.0f, 1.0f, 0.0f);
-
-	mat4 viewMatrix = lookAt(cameraPosition, cameraTarget, cameraUp);
-
-	vec3 position = cameraPosition;
-	float horizontalAngle = 0.0f;
-	float verticalAngle = 0.0f;
-	float fieldOfView = 45.0f;
-
-	float cameraSpeed = 2.0f;
-	float mouseSensitivity = 0.01;
-
-	mat4 projectionMatrix = perspective(radians(90.0f), float(4 / 3), 0.1f, 100.0f);*/
 
 	// Lighting
 	vec3 lightDirection = vec3(0.0f, 0.0f, -1.0f);
