@@ -91,9 +91,7 @@ int main(int argc, char* args[])
 	Lighting light;
 
 	// Material
-	vec4 ambientMaterialColor = vec4(0.1f, 0.1f, 0.1f, 1.0f);
-	vec4 diffuseMaterialColor = vec4(0.8f, 0.8f, 0.8f, 1.0f);
-	vec4 specualarMaterialColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	Material material;
 
 	// Color buffer texture
 	GLuint colorBufferID = createTexture(windowWidth, windowHeight);
@@ -190,21 +188,7 @@ int main(int argc, char* args[])
 	light.InitialiseUniformLocations(tank.programID);
 
 	// Material
-	GLint ambientMaterialColorLocation = glGetUniformLocation(tank.programID, "ambientMaterialColor");
-	if (ambientMaterialColorLocation < 0)
-	{
-		printf("Unable to find %s uniform", "ambientMaterialColor");
-	}
-	GLint diffuseMaterialColorLocation = glGetUniformLocation(tank.programID, "diffuseMaterialColor");
-	if (diffuseMaterialColorLocation < 0)
-	{
-		printf("Unable to find %s uniform", "diffuseMaterialColor");
-	}
-	GLint specularMaterialColorLocation = glGetUniformLocation(tank.programID, "specularMaterialColor");
-	if (specularMaterialColorLocation < 0)
-	{
-		printf("Unable to find %s uniform", "specularMaterialColor");
-	}
+	material.InitialiseUniformLocations(tank.programID);
 
 	///-----bullet initialization_start-----
 
@@ -380,12 +364,10 @@ int main(int argc, char* args[])
 		glUniform1i(textureLocation, 0);
 
 		// Lighting
-		light.AttatchUniformLocations(tank.programID);
+		light.UseUniformLocations(tank.programID);
 
 		// Material
-		glUniform4fv(ambientMaterialColorLocation, 1, value_ptr(ambientMaterialColor));
-		glUniform4fv(diffuseMaterialColorLocation, 1, value_ptr(diffuseMaterialColor));
-		glUniform4fv(specularMaterialColorLocation, 1, value_ptr(light.specularColor));
+		material.UseUniformLocations(tank.programID, light);
 		
 
 		//Draw the triangle

@@ -45,7 +45,7 @@ void Lighting::InitialiseUniformLocations(GLuint programID) {
 	}
 }
 
-void Lighting::AttatchUniformLocations(GLuint programID)
+void Lighting::UseUniformLocations(GLuint programID)
 {
 	glUseProgram(programID);
 

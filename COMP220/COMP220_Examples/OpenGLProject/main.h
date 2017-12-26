@@ -23,6 +23,7 @@
 #include "InputManager.h"
 #include "Input.h"
 #include "Lighting.h"
+#include "Material.h"
 
 void loadImageSupport();
 void requestCoreOpenGL(int majVer, int minVer);
