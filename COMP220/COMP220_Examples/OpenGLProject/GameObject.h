@@ -28,6 +28,8 @@ public:
 	~GameObject();
 
 	void CreateRigidBody();
+	void CreateUniformLocations();
+	void UseUniformLocations();
 	void Draw();
 	void Update();
 	void Destroy();
@@ -46,6 +48,15 @@ public:
 
 	btRigidBody* objectRigidBody;
 
+	GLint fragColorLocation;
+
+	GLint currentTimeLocation;
+
+	GLint modelMatrixLocation;
+	GLint viewMatrixLocation;
+	GLint projectionMatrixLocation;
+	GLint textureLocation;
+	GLint cameraPositionLocation;
 
 private:
 	glm::mat4 rotationMatrix;

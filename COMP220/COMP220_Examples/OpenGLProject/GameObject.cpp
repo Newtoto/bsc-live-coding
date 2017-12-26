@@ -34,6 +34,54 @@ void GameObject::CreateRigidBody()
 	objectRigidBody = new btRigidBody(rbInfo);
 }
 
+void GameObject::CreateUniformLocations()
+{
+	GLint fragColorLocation = glGetUniformLocation(programID, "fragColor");
+	if (fragColorLocation < 0)
+	{
+		printf("Unable to find %s uniform", "fragColor");
+	}
+
+	static const GLfloat fragColor[] = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+	currentTimeLocation = glGetUniformLocation(programID, "time");
+	if (currentTimeLocation < 0)
+	{
+		printf("Unable to find %s uniform", "time");
+	}
+
+	modelMatrixLocation = glGetUniformLocation(programID, "modelMatrix");
+	if (modelMatrixLocation < 0)
+	{
+		printf("Unable to find %s uniform", "modelMatrix");
+	}
+	viewMatrixLocation = glGetUniformLocation(programID, "viewMatrix");
+	if (viewMatrixLocation < 0)
+	{
+		printf("Unable to find %s uniform", "viewMatrix");
+	}
+	projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
+	if (projectionMatrixLocation < 0)
+	{
+		printf("Unable to find %s uniform", "projectionMatrix");
+	}
+	textureLocation = glGetUniformLocation(programID, "baseTexture");
+	if (textureLocation < 0)
+	{
+		printf("Unable to find %s uniform", "baseTexture");
+	}
+	cameraPositionLocation = glGetUniformLocation(programID, "cameraPosition");
+	if (cameraPositionLocation < 0)
+	{
+		printf("Unable to find %s uniform", "cameraPosition");
+	}
+}
+
+void GameObject::UseUniformLocations()
+{
+
+}
+
 void GameObject::Draw()
 {
 	for (Mesh *currentMesh : meshes)

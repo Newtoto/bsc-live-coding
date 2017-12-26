@@ -144,45 +144,8 @@ int main(int argc, char* args[])
 
 	//Create and compile GLSL program from shaders
 
-	GLint fragColorLocation = glGetUniformLocation(tank.programID, "fragColor");
-	if (fragColorLocation < 0) 
-	{
-		printf("Unable to find %s uniform", "fragColor");
-	}
-
+	tank.CreateUniformLocations();
 	static const GLfloat fragColor[] = { 0.0f, 1.0f, 0.0f, 1.0f };
-
-	GLint currentTimeLocation = glGetUniformLocation(tank.programID, "time");
-	if (currentTimeLocation < 0)
-	{
-		printf("Unable to find %s uniform", "time");
-	}
-
-	GLint modelMatrixLocation = glGetUniformLocation(tank.programID, "modelMatrix");
-	if (modelMatrixLocation < 0)
-	{
-		printf("Unable to find %s uniform", "modelMatrix");
-	}
-	GLint viewMatrixLocation = glGetUniformLocation(tank.programID, "viewMatrix");
-	if (viewMatrixLocation < 0)
-	{
-		printf("Unable to find %s uniform", "viewMatrix");
-	}
-	GLint projectionMatrixLocation = glGetUniformLocation(tank.programID, "projectionMatrix");
-	if (projectionMatrixLocation < 0)
-	{
-		printf("Unable to find %s uniform", "projectionMatrix");
-	}
-	GLint textureLocation = glGetUniformLocation(tank.programID, "baseTexture");
-	if (textureLocation < 0)
-	{
-		printf("Unable to find %s uniform", "baseTexture");
-	}
-	GLint cameraPositionLocation = glGetUniformLocation(tank.programID, "cameraPosition");
-	if (cameraPositionLocation < 0)
-	{
-		printf("Unable to find %s uniform", "cameraPosition");
-	}
 
 	// Lighting
 	light.InitialiseUniformLocations(tank.programID);
@@ -354,14 +317,14 @@ int main(int argc, char* args[])
 
 		glUseProgram(tank.programID);
 
-		glUniform4fv(fragColorLocation, 1, fragColor);
-		glUniform1f(currentTimeLocation, (float)(currentTicks) / 1000.0f);
-		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(tank.modelMatrix));
-		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.viewMatrix));
-		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.projectionMatrix));
+		glUniform4fv(tank.fragColorLocation, 1, fragColor);
+		glUniform1f(tank.currentTimeLocation, (float)(currentTicks) / 1000.0f);
+		glUniformMatrix4fv(tank.modelMatrixLocation, 1, GL_FALSE, value_ptr(tank.modelMatrix));
+		glUniformMatrix4fv(tank.viewMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.viewMatrix));
+		glUniformMatrix4fv(tank.projectionMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.projectionMatrix));
 
-		glUniform3fv(cameraPositionLocation, 1, value_ptr(playerCamera.cameraPosition));
-		glUniform1i(textureLocation, 0);
+		glUniform3fv(tank.cameraPositionLocation, 1, value_ptr(playerCamera.cameraPosition));
+		glUniform1i(tank.textureLocation, 0);
 
 		// Lighting
 		light.UseUniformLocations(tank.programID);
