@@ -82,7 +82,7 @@ int main(int argc, char* args[])
 
 	// Add tanks
 	GameObject tank(vec3(10.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f));
-	tank.update();
+	tank.Update();
 
 	// Add camera
 	Camera playerCamera;
@@ -229,7 +229,7 @@ int main(int argc, char* args[])
 	dynamicsWorld->addRigidBody(groundRigidBody);
 
 	// Create tank colision
-	tank.createRigidBody();
+	tank.CreateRigidBody();
 	dynamicsWorld->addRigidBody(tank.objectRigidBody);
 
 	glEnable(GL_DEPTH_TEST);
@@ -321,10 +321,10 @@ int main(int argc, char* args[])
 
 		// Run through inputs
 		// Forward and backward movement
-		playerCamera.forward(inputs.forward.GetValue());
+		playerCamera.Forward(inputs.forward.GetValue());
 
 		// Sideways movement
-		playerCamera.sideways(inputs.sideways.GetValue());
+		playerCamera.Sideways(inputs.sideways.GetValue());
 
 		currentTicks = SDL_GetTicks();
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
@@ -336,10 +336,10 @@ int main(int argc, char* args[])
 		SDL_WarpMouseInWindow(window, windowWidth / 2, windowHeight / 2);
 
 		// Move camera based on mouse movement
-		playerCamera.moveView(windowWidth, windowHeight);
+		playerCamera.MoveView(windowWidth, windowHeight);
 
 		//Recalculate object position
-		tank.update();
+		tank.Update();
 
 		glEnable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
@@ -371,7 +371,7 @@ int main(int argc, char* args[])
 		
 
 		//Draw the triangle
-		tank.draw();
+		tank.Draw();
 
 		glDisable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -396,7 +396,7 @@ int main(int argc, char* args[])
 	
 	// Destroy models
 	dynamicsWorld->removeRigidBody(tank.objectRigidBody);
-	tank.destroy();
+	tank.Destroy();
 
 	dynamicsWorld->removeRigidBody(groundRigidBody);
 	// Delete ground

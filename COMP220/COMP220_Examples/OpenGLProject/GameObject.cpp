@@ -16,7 +16,7 @@ GameObject::~GameObject()
 {
 }
 
-void GameObject::createRigidBody()
+void GameObject::CreateRigidBody()
 {
 	// Create colision
 	objectColShape = new btBoxShape(btVector3(2, 2, 2));
@@ -34,7 +34,7 @@ void GameObject::createRigidBody()
 	objectRigidBody = new btRigidBody(rbInfo);
 }
 
-void GameObject::draw()
+void GameObject::Draw()
 {
 	for (Mesh *currentMesh : meshes)
 	{
@@ -42,7 +42,7 @@ void GameObject::draw()
 	}
 }
 
-void GameObject::update()
+void GameObject::Update()
 {
 	if (objectRigidBody)
 	{
@@ -61,7 +61,7 @@ void GameObject::update()
 	modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
 }
 
-void GameObject::destroy()
+void GameObject::Destroy()
 {
 	// Delete rigid body
 	delete objectColShape;

@@ -27,10 +27,10 @@ public:
 	class GameObject(glm::vec3 position, glm::vec3 scale, glm::vec3 rotation);
 	~GameObject();
 
-	void createRigidBody();
-	void draw();
-	void update();
-	void destroy();
+	void CreateRigidBody();
+	void Draw();
+	void Update();
+	void Destroy();
 
 	GLuint programID;
 
