@@ -22,6 +22,7 @@
 #include "Camera.h"
 #include "InputManager.h"
 #include "Input.h"
+#include "Lighting.h"
 
 void loadImageSupport();
 void requestCoreOpenGL(int majVer, int minVer);

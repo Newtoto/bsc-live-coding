@@ -88,11 +88,12 @@ int main(int argc, char* args[])
 	Camera playerCamera;
 
 	// Lighting
-	vec3 lightDirection = vec3(0.0f, 0.0f, -1.0f);
+	Lighting light;
+	/*vec3 lightDirection = vec3(0.0f, 0.0f, -1.0f);
 	vec4 ambientLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	vec4 diffuseLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	vec4 specularLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	float specularPower = 25.0f;
+	float specularPower = 25.0f;*/
 
 	// Material
 	vec4 ambientMaterialColor = vec4(0.1f, 0.1f, 0.1f, 1.0f);
@@ -409,16 +410,16 @@ int main(int argc, char* args[])
 		glUniform1i(textureLocation, 0);
 
 		// Lighting
-		glUniform3fv(lightDirectionLocation, 1, value_ptr(lightDirection));
-		glUniform4fv(ambientLightColorLocation, 1, value_ptr(ambientLightColor));
-		glUniform4fv(diffuseLightColorLocation, 1, value_ptr(diffuseLightColor));
-		glUniform4fv(specularLightColorLocation, 1, value_ptr(specularLightColor));
-		glUniform1f(specularPowerLocation, specularPower);
+		glUniform3fv(lightDirectionLocation, 1, value_ptr(light.direction));
+		glUniform4fv(ambientLightColorLocation, 1, value_ptr(light.ambientColor));
+		glUniform4fv(diffuseLightColorLocation, 1, value_ptr(light.diffuseColor));
+		glUniform4fv(specularLightColorLocation, 1, value_ptr(light.specularColor));
+		glUniform1f(specularPowerLocation, light.specularPower);
 
 		// Material
 		glUniform4fv(ambientMaterialColorLocation, 1, value_ptr(ambientMaterialColor));
 		glUniform4fv(diffuseMaterialColorLocation, 1, value_ptr(diffuseMaterialColor));
-		glUniform4fv(specularMaterialColorLocation, 1, value_ptr(specularLightColor));
+		glUniform4fv(specularMaterialColorLocation, 1, value_ptr(light.specularColor));
 		
 
 		//Draw the triangle
