@@ -316,15 +316,8 @@ int main(int argc, char* args[])
 		glBindTexture(GL_TEXTURE_2D, tank.textureID);
 
 		glUseProgram(tank.programID);
-
 		glUniform4fv(tank.fragColorLocation, 1, fragColor);
-		glUniform1f(tank.currentTimeLocation, (float)(currentTicks) / 1000.0f);
-		glUniformMatrix4fv(tank.modelMatrixLocation, 1, GL_FALSE, value_ptr(tank.modelMatrix));
-		glUniformMatrix4fv(tank.viewMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.viewMatrix));
-		glUniformMatrix4fv(tank.projectionMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.projectionMatrix));
-
-		glUniform3fv(tank.cameraPositionLocation, 1, value_ptr(playerCamera.cameraPosition));
-		glUniform1i(tank.textureLocation, 0);
+		tank.UseUniformLocations(currentTicks, playerCamera);
 
 		// Lighting
 		light.UseUniformLocations(tank.programID);

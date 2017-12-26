@@ -20,6 +20,7 @@
 #include "Texture.h"
 #include "Model.h"
 #include "Mesh.h"
+#include "Camera.h"
 
 class GameObject
 {
@@ -29,7 +30,7 @@ public:
 
 	void CreateRigidBody();
 	void CreateUniformLocations();
-	void UseUniformLocations();
+	void UseUniformLocations(float currentTicks, Camera playerCamera);
 	void Draw();
 	void Update();
 	void Destroy();

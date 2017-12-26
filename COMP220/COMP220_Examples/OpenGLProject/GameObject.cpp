@@ -42,8 +42,6 @@ void GameObject::CreateUniformLocations()
 		printf("Unable to find %s uniform", "fragColor");
 	}
 
-	static const GLfloat fragColor[] = { 0.0f, 1.0f, 0.0f, 1.0f };
-
 	currentTimeLocation = glGetUniformLocation(programID, "time");
 	if (currentTimeLocation < 0)
 	{
@@ -77,9 +75,16 @@ void GameObject::CreateUniformLocations()
 	}
 }
 
-void GameObject::UseUniformLocations()
+void GameObject::UseUniformLocations(float currentTicks, Camera playerCamera)
 {
+	glUniform1f(currentTimeLocation, (float)(currentTicks) / 1000.0f);
 
+	glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(modelMatrix));
+	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.viewMatrix));
+	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.projectionMatrix));
+
+	glUniform3fv(cameraPositionLocation, 1, value_ptr(playerCamera.cameraPosition));
+	glUniform1i(textureLocation, 0);
 }
 
 void GameObject::Draw()
