@@ -285,8 +285,7 @@ int main(int argc, char* args[])
 
 	SDL_WarpMouseInWindow(window, windowWidth / 2, windowHeight / 2);
 
-	Input forward;
-	Input sideways;
+	InputManager inputs;
 
 	//Event loop, we will loop until running is set to false, usually if escape has been pressed or window is closed
 	bool running = true;
@@ -320,19 +319,19 @@ int main(int argc, char* args[])
 					break;
 
 				case SDLK_w:
-					forward.SetPositive();
+					inputs.forward.SetPositive();
 					break;
 
 				case SDLK_a:
-					sideways.SetPositive();
+					inputs.sideways.SetPositive();
 					break;
 
 				case SDLK_s:
-					forward.SetNegative();
+					inputs.forward.SetNegative();
 					break;
 
 				case SDLK_d:
-					sideways.SetNegative();
+					inputs.sideways.SetNegative();
 					break;
 
 				default:
@@ -344,19 +343,19 @@ int main(int argc, char* args[])
 				switch (event.key.keysym.sym)
 				{
 				case SDLK_w:
-					forward.ZeroPositive();
+					inputs.forward.ZeroPositive();
 					break;
 
 				case SDLK_a:
-					sideways.ZeroPositive();
+					inputs.sideways.ZeroPositive();
 					break;
 
 				case SDLK_s:
-					forward.ZeroNegative();
+					inputs.forward.ZeroNegative();
 					break;
 
 				case SDLK_d:
-					sideways.ZeroNegative();
+					inputs.sideways.ZeroNegative();
 					break;
 
 				default:
@@ -367,11 +366,10 @@ int main(int argc, char* args[])
 
 		// Run through inputs
 		// Forward and backward movement
-		playerCamera.forward(forward.GetValue());
+		playerCamera.forward(inputs.forward.GetValue());
 
 		// Sideways movement
-		playerCamera.sideways(sideways.GetValue());
-		printf("%", sideways.GetValue());
+		playerCamera.sideways(inputs.sideways.GetValue());
 
 		currentTicks = SDL_GetTicks();
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
