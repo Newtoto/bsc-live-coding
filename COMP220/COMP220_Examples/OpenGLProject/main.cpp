@@ -57,6 +57,8 @@ int initialiseSDLWindowAndOpenGL(int windowWidth, int windowHeight) {
 	{
 		return 1;
 	}
+
+	return 0;
 }
 
 void quitSDL() {
