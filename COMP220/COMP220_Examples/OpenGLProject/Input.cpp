@@ -15,7 +15,7 @@ Input::~Input()
 
 void Input::SetPositive()
 {
-	if (!negativePressed)
+	if (negativePressed == false)
 	{
 		positivePressed = true;
 	}
@@ -23,7 +23,7 @@ void Input::SetPositive()
 
 void Input::SetNegative()
 {
-	if (!positivePressed)
+	if (positivePressed == false)
 	{
 		negativePressed = true;
 	}

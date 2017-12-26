@@ -305,32 +305,17 @@ int main(int argc, char* args[])
 	bool running = true;
 
 	//SDL Event structure, this will be checked in the while loop
-	SDL_Event ev;
+	SDL_Event event;
 
 	while (running)
 	{
 		//Poll for the events which have happened in this frame
-		//https://wiki.libsdl.org/SDL_PollEvent
-		while (SDL_PollEvent(&ev))
+		while (SDL_PollEvent(&event))
 		{
-			//Switch case for every message we are intereted in
-			switch (ev.type)
+			if (event.type == SDL_KEYDOWN)
 			{
-				//QUIT Message, usually called when the window has been closed
-			case SDL_QUIT:
-				running = false;
-				break;
-				//KEYDOWN Message, called when a key has been pressed down
-			case SDL_KEYDOWN:
-				//Check the actual key code of the key that has been pressed
-				switch (ev.key.keysym.sym)
+				switch (event.key.keysym.sym)
 				{
-					//Escape key
-				case SDLK_ESCAPE:
-					running = false;
-					break;
-
-				// Change input manager value if key is pressed
 				case SDLK_UP:
 					// Increase mouse sensitivity
 					playerCamera.mouseSensitivity += 0.001;
@@ -341,6 +326,10 @@ int main(int argc, char* args[])
 					if (playerCamera.mouseSensitivity > 0.001) {
 						playerCamera.mouseSensitivity -= 0.001;
 					}
+					break;
+
+				case SDLK_ESCAPE:
+					running = false;
 					break;
 
 				case SDLK_w:
@@ -362,22 +351,15 @@ int main(int argc, char* args[])
 					sideways.SetNegative();
 					//playerCamera.sideways(-1.0f);
 					break;
-				};
-			// Change input manager value if key is released
-			case SDL_KEYUP:
-				//Check the actual key code of the key that has been pressed
-				switch (ev.key.keysym.sym)
+
+				default:
+					break;
+				}
+			}
+			if (event.type == SDL_KEYUP)
+			{
+				switch (event.key.keysym.sym)
 				{
-				case SDLK_UP:
-					// TODO Mouse sensitivity input
-					//inputs.ZeroValue(inputs.mouseSensitivityUp, 1);
-					break;
-
-				case SDLK_DOWN:
-					// TODO Mouse sensitivity input
-					//inputs.ZeroValue(inputs.mouseSensitivityUp, 1);
-					break;
-
 				case SDLK_w:
 					forward.ZeroPositive();
 					break;
@@ -393,24 +375,20 @@ int main(int argc, char* args[])
 				case SDLK_d:
 					sideways.ZeroNegative();
 					break;
+
+				default:
+					break;
 				}
 			}
 		}
 
 		// Run through inputs
 		// Forward and backward movement
-		if (forward.GetValue() != 0)
-		{
-			// Move forward
-			playerCamera.forward(forward.GetValue());
-		}
+		playerCamera.forward(forward.GetValue());
 
 		// Sideways movement
-		if (sideways.GetValue() != 0)
-		{
-			// Move right
-			playerCamera.sideways(sideways.GetValue());
-		}
+		playerCamera.sideways(sideways.GetValue());
+		printf("%", sideways.GetValue());
 
 		currentTicks = SDL_GetTicks();
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
