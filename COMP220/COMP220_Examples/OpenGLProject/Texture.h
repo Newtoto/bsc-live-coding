@@ -6,6 +6,6 @@
 
 #include <string>
 
-GLuint loadTextureFromFile(const std::string& filename);
+GLuint LoadTextureFromFile(const std::string& filename);
 
-GLuint createTexture(int width, int height);
+GLuint CreateTexture(int width, int height);

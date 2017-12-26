@@ -94,7 +94,7 @@ int main(int argc, char* args[])
 	Material material;
 
 	// Color buffer texture
-	GLuint colorBufferID = createTexture(windowWidth, windowHeight);
+	GLuint colorBufferID = CreateTexture(windowWidth, windowHeight);
 
 	// Create depth buffer
 	GLuint depthRenderBufferID;
