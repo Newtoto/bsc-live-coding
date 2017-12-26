@@ -25,7 +25,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::moveView(float windowWidth, float windowHeight)
+void Camera::MoveView(float windowWidth, float windowHeight)
 {
 	// Get mouse movement
 	int mouseX, mouseY;
@@ -41,14 +41,14 @@ void Camera::moveView(float windowWidth, float windowHeight)
 	viewMatrix = lookAt(cameraPosition, direction + cameraPosition, cameraUp);
 }
 
-void Camera::forward(float magnitude)
+void Camera::Forward(float magnitude)
 {
 	glm::vec3 direction(cos(verticalAngle) * sin(horizontalAngle), sin(verticalAngle), cos(verticalAngle) * cos(horizontalAngle));
 
 	cameraPosition += direction * glm::vec3(magnitude * cameraSpeed, 0.0f, magnitude * cameraSpeed);
 }
 
-void Camera::sideways(float magnitude)
+void Camera::Sideways(float magnitude)
 {
 	glm::vec3 direction(cos(verticalAngle) * sin(horizontalAngle), sin(verticalAngle), cos(verticalAngle) * cos(horizontalAngle));
 

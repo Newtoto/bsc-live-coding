@@ -15,9 +15,9 @@ public:
 	class Camera();
 	~Camera();
 
-	void moveView(float windowWidth, float windowHeight);
-	void forward(float magnitude);
-	void sideways(float magnitude);
+	void MoveView(float windowWidth, float windowHeight);
+	void Forward(float magnitude);
+	void Sideways(float magnitude);
 	
 	glm::vec3 cameraPosition;
 
