@@ -11,5 +11,5 @@ public:
 	InputManager();
 	~InputManager();
 
-	Input forward, sideways;
+	Input forward, sideways, jump;
 };

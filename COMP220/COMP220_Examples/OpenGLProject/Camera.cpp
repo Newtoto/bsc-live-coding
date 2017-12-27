@@ -16,10 +16,12 @@ Camera::Camera()
 	verticalAngle = 0.0f;
 	fieldOfView = 45.0f;
 
-	cameraSpeed = 0.2f;
+	cameraSpeed = 0.1f;
 	mouseSensitivity = 0.01;
 
 	projectionMatrix = glm::perspective(glm::radians(90.0f), float(4 / 3), 0.1f, 100.0f);
+
+	jumping = false;
 }
 
 
@@ -45,10 +47,34 @@ void Camera::MoveView(float windowWidth, float windowHeight)
 
 void Camera::ApplyGravity(float groundHeight)
 {
-	if (cameraPosition.y > groundHeight + playerHeight)
+	headHeight = groundHeight + playerHeight;
+	if (cameraPosition.y > headHeight)
 	{
-		cameraPosition.y -= 0.1;
+		cameraPosition.y -= 0.2;
 	}
+	else
+	{
+		jumping = false;
+	}
+}
+
+void Camera::Jump()
+{
+	printf("in jump");
+	if (!jumping)
+	{
+		jumpTimer = 10;
+		jumping = true;
+	}
+	if (jumpTimer > 0)
+	{
+		jumpTimer -= 1;
+		printf("moving up ");
+		cameraPosition.y += 1.0 * jumpTimer/10;
+	}
+
+	//cameraPosition.y += 0.2 * magnitude;
+
 }
 
 void Camera::Forward(float magnitude)

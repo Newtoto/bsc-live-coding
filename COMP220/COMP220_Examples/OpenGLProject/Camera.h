@@ -19,6 +19,7 @@ public:
 
 	void MoveView(float windowWidth, float windowHeight);
 	void ApplyGravity(float groundHeight);
+	void Jump();
 	void Forward(float magnitude);
 	void Sideways(float magnitude);
 	
@@ -32,6 +33,10 @@ public:
 
 	float horizontalAngle;
 	float verticalAngle;
+	float headHeight;
+
+	float jumpTimer;
+	bool jumping;
 
 private:
 	// default camera position
