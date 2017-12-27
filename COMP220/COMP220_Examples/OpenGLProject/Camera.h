@@ -9,6 +9,8 @@
 #include <glm\gtx\transform.hpp>
 #include <glm\gtc\type_ptr.hpp>
 
+#include <btBulletDynamicsCommon.h>
+
 class Camera
 {
 public:
@@ -16,6 +18,7 @@ public:
 	~Camera();
 
 	void MoveView(float windowWidth, float windowHeight);
+	void ApplyGravity(float groundHeight);
 	void Forward(float magnitude);
 	void Sideways(float magnitude);
 	
@@ -40,4 +43,6 @@ private:
 	float fieldOfView;
 
 	float cameraSpeed;
+
+	float playerHeight;
 };

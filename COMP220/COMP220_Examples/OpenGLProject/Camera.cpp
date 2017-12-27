@@ -7,6 +7,8 @@ Camera::Camera()
 	cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
+	playerHeight = 2.5f;
+
 	viewMatrix = lookAt(cameraPosition, cameraTarget, cameraUp);
 
 	position = cameraPosition;
@@ -39,6 +41,14 @@ void Camera::MoveView(float windowWidth, float windowHeight)
 
 	//Recalculate camera
 	viewMatrix = lookAt(cameraPosition, direction + cameraPosition, cameraUp);
+}
+
+void Camera::ApplyGravity(float groundHeight)
+{
+	if (cameraPosition.y > groundHeight + playerHeight)
+	{
+		cameraPosition.y -= 0.1;
+	}
 }
 
 void Camera::Forward(float magnitude)

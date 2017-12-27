@@ -312,6 +312,7 @@ int main(int argc, char* args[])
 
 		// Move camera based on mouse movement
 		playerCamera.MoveView(windowWidth, windowHeight);
+		playerCamera.ApplyGravity(groundTransform.getOrigin().getY() + 3.0f);
 
 		//Recalculate object position
 		tank.Update();

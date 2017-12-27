@@ -36,7 +36,7 @@ void GameObject::CreateRigidBody()
 
 void GameObject::CreateUniformLocations()
 {
-	GLint fragColorLocation = glGetUniformLocation(programID, "fragColor");
+	fragColorLocation = glGetUniformLocation(programID, "fragColor");
 	if (fragColorLocation < 0)
 	{
 		printf("Unable to find %s uniform", "fragColor");
