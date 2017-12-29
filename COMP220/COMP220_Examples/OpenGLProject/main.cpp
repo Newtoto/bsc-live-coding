@@ -90,11 +90,17 @@ int main(int argc, char* args[])
 	vec4 diffuseLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	vec4 specularLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
+	// Create game object list
+	std::vector<GameObject*> m_GameObjectList;
+
 	// Create tank
 	GameObject * pTank = new GameObject();
 	pTank->LoadMeshesFromFile("Tank1.FBX");
 	pTank->LoadDiffuseTextureFromFile("Tank1DF.png");
-	pTank->LoadShaderProgram("lightingVert.glsl", "lightingFrag.glsl");
+	pTank->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
+
+	m_GameObjectList.push_back(pTank);
+	
 
 	// Color buffer texture
 	GLuint colorBufferID = CreateTexture(windowWidth, windowHeight);
