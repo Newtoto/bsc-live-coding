@@ -80,22 +80,21 @@ int main(int argc, char* args[])
 		QuitSDL();
 	}
 
-	// Add tanks
-	GameObject tank(vec3(10.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f));
-	tank.Update();
-
-	// Second tank
-	GameObject secondTank(vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f));
-	secondTank.Update();
-
 	// Add camera
 	Camera playerCamera;
 
 	// Lighting
-	Lighting light;
+	//Lighting light;
+	vec4 ambientLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	vec3 lightDirection = vec3(0.0f, 0.0f, 1.0f);
+	vec4 diffuseLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	vec4 specularLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	// Material
-	Material material;
+	// Create tank
+	GameObject * pTank = new GameObject();
+	pTank->LoadMeshesFromFile("Tank1.FBX");
+	pTank->LoadDiffuseTextureFromFile("Tank1DF.png");
+	pTank->LoadShaderProgram("lightingVert.glsl", "lightingFrag.glsl");
 
 	// Color buffer texture
 	GLuint colorBufferID = CreateTexture(windowWidth, windowHeight);
@@ -146,21 +145,6 @@ int main(int argc, char* args[])
 		printf("Unable to find %s uniform", "texture0");
 	}
 
-	//Create and compile GLSL program from shaders
-
-	tank.CreateUniformLocations();
-	secondTank.CreateUniformLocations();
-
-	static const GLfloat fragColor[] = { 0.0f, 1.0f, 0.0f, 1.0f };
-
-	// Lighting
-	light.InitialiseUniformLocations(tank.programID);
-	light.InitialiseUniformLocations(secondTank.programID);
-
-	// Material
-	material.InitialiseUniformLocations(tank.programID);
-	material.InitialiseUniformLocations(secondTank.programID);
-
 	///-----bullet initialization_start-----
 
 	///collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
@@ -200,18 +184,12 @@ int main(int argc, char* args[])
 	dynamicsWorld->addRigidBody(groundRigidBody);
 
 	// Create tank collision
-	tank.CreateRigidBody();
-	dynamicsWorld->addRigidBody(tank.objectRigidBody);
-
-	// Second tank collision
-	secondTank.CreateRigidBody();
-	dynamicsWorld->addRigidBody(secondTank.objectRigidBody);
+	pTank->CreateRigidBody();
+	dynamicsWorld->addRigidBody(pTank->m_rigidBody);
 
 	glEnable(GL_DEPTH_TEST);
 	int lastTicks = SDL_GetTicks();
 	int currentTicks = SDL_GetTicks();
-
-
 
 	SDL_WarpMouseInWindow(window, windowWidth / 2, windowHeight / 2);
 
@@ -365,8 +343,7 @@ int main(int argc, char* args[])
 		playerCamera.ApplyGravity(groundTransform.getOrigin().getY() + 3.0f);
 
 		//Recalculate object position
-		tank.Update();
-		secondTank.Update();
+		pTank->Update();
 
 		glEnable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
@@ -376,38 +353,35 @@ int main(int argc, char* args[])
 		glClearDepth(1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tank.textureID);
+		pTank->PreRender();
 
-		glUseProgram(tank.programID);
-		glUniform4fv(tank.fragColorLocation, 1, fragColor);
-		tank.UseUniformLocations(currentTicks, playerCamera);
+		GLuint currentProgramID = pTank->GetShaderProgramID();
 
-		// Lighting
-		light.UseUniformLocations(tank.programID);
+		// Retrieve shader values
+		GLint viewMatrixLocation = glGetUniformLocation(currentProgramID, "viewMatrix");
+		GLint projectionMatrixLocation = glGetUniformLocation(currentProgramID, "projectionMatrix");
+		GLint lightDirectionLocation = glGetUniformLocation(currentProgramID, "lightDirection");
+		GLint ambientLightColorLocation = glGetUniformLocation(currentProgramID, "ambientLightColor");
+		GLint diffuseLightColorLocation = glGetUniformLocation(currentProgramID, "diffuseLightColor");
+		GLint specularLightColorLocation = glGetUniformLocation(currentProgramID, "specularLightColor");
 
-		// Material
-		material.UseUniformLocations(tank.programID, light);
+		// Send shader values
+		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.viewMatrix));
+		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.projectionMatrix));
+
+		glUniform3fv(lightDirectionLocation, 1, value_ptr(lightDirection));
+		glUniform4fv(ambientLightColorLocation, 1, value_ptr(ambientLightColor));
+		glUniform4fv(diffuseLightColorLocation, 1, value_ptr(diffuseLightColor));
+		glUniform4fv(specularLightColorLocation, 1, value_ptr(specularLightColor));
+
+		//// Lighting
+		//light.UseUniformLocations(pTank->GetShaderProgramID());
+
+		//// Material
+		//material.UseUniformLocations(tank.GetShaderProgramID, light);
 		
-		//Draw the triangle
-		tank.Draw();
-
-		// Second tank
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, secondTank.textureID);
-
-		glUseProgram(secondTank.programID);
-		glUniform4fv(secondTank.fragColorLocation, 1, fragColor);
-		tank.UseUniformLocations(currentTicks, playerCamera);
-
-		// Lighting
-		light.UseUniformLocations(secondTank.programID);
-
-		// Material
-		material.UseUniformLocations(secondTank.programID, light);
-
-		//Draw the triangle
-		secondTank.Draw();
+		//Draw the tank
+		pTank->Render();
 
 		glDisable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -430,12 +404,8 @@ int main(int argc, char* args[])
 		lastTicks = currentTicks;
 	}
 	
-	// Destroy models
-	dynamicsWorld->removeRigidBody(tank.objectRigidBody);
-	tank.Destroy();
-
-	dynamicsWorld->removeRigidBody(secondTank.objectRigidBody);
-	secondTank.Destroy();
+	// Remove tank from world
+	dynamicsWorld->removeRigidBody(pTank->m_rigidBody);
 
 	dynamicsWorld->removeRigidBody(groundRigidBody);
 	// Delete ground
@@ -457,6 +427,13 @@ int main(int argc, char* args[])
 	delete dispatcher;
 
 	delete collisionConfiguration;
+
+	if (pTank)
+	{
+		pTank->Destroy();
+		delete pTank;
+		pTank = nullptr;
+	}
 
 	// Delete post processing from memory
 	glDeleteProgram(postProcessingProgramID);
