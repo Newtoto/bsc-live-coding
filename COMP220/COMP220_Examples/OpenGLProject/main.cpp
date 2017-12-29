@@ -326,10 +326,16 @@ int main(int argc, char* args[])
 
 		// Run through inputs
 		// Forward and backward movement
-		playerCamera.Forward(inputs.forward.GetValue());
+		if (inputs.forward.GetValue() != 0)
+		{
+			playerCamera.Forward(inputs.forward.GetValue());
+		}
 
 		// Sideways movement
-		playerCamera.Sideways(inputs.sideways.GetValue());
+		if (inputs.sideways.GetValue() != 0)
+		{
+			playerCamera.Sideways(inputs.sideways.GetValue());
+		}
 
 		// Jumping
 		if (inputs.jump.GetValue() != 0 || playerCamera.jumping == true) {
