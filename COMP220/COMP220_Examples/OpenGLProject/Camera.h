@@ -20,6 +20,7 @@ public:
 	void MoveView(float windowWidth, float windowHeight);
 	void ApplyGravity(float groundHeight);
 	void Jump();
+	void Fly(float magnitude);
 	void Forward(float magnitude);
 	void Sideways(float magnitude);
 	
@@ -37,6 +38,8 @@ public:
 
 	float jumpTimer;
 	bool jumping;
+	bool flyingReady;
+	bool flying;
 
 private:
 	// default camera position

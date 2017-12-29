@@ -266,8 +266,17 @@ int main(int argc, char* args[])
 
 				case SDLK_SPACE:
 					inputs.jump.SetPositive();
-					printf("Hi");
+					inputs.fly.SetPositive();
 					break;
+
+				case SDLK_LSHIFT:
+					inputs.fly.SetNegative();
+					break;
+
+				case SDLK_f:
+					// enable fly
+					playerCamera.flying = true;
+
 				default:
 					break;
 				}
@@ -294,6 +303,11 @@ int main(int argc, char* args[])
 
 				case SDLK_SPACE:
 					inputs.jump.ZeroPositive();
+					inputs.fly.ZeroPositive();
+					break;
+
+				case SDLK_LSHIFT:
+					inputs.fly.ZeroNegative();
 					break;
 
 				default:
@@ -310,9 +324,12 @@ int main(int argc, char* args[])
 		playerCamera.Sideways(inputs.sideways.GetValue());
 
 		// Jumping
-		if (inputs.jump.GetValue() == 1.0f || playerCamera.jumping == true) {
-			playerCamera.Jump();
+		if (inputs.jump.GetValue() != 0 || playerCamera.jumping == true) {
+			playerCamera.Jump();  
 		}
+		
+		// Listen for playerCamera fly events
+		playerCamera.Fly(inputs.fly.GetValue());
 
 		currentTicks = SDL_GetTicks();
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;

@@ -22,6 +22,8 @@ Camera::Camera()
 	projectionMatrix = glm::perspective(glm::radians(90.0f), float(4 / 3), 0.1f, 100.0f);
 
 	jumping = false;
+	flyingReady = false;
+	flying = false;
 }
 
 
@@ -50,31 +52,53 @@ void Camera::ApplyGravity(float groundHeight)
 	headHeight = groundHeight + playerHeight;
 	if (cameraPosition.y > headHeight)
 	{
-		cameraPosition.y -= 0.2;
+		// only apply gravity when player is not flying
+		if (!flying)
+		{
+			cameraPosition.y -= 0.1;
+		}
 	}
 	else
 	{
+		// if not above ground height, stop jumping and flying
 		jumping = false;
+		flyingReady = false;
+		flying = false;
 	}
 }
 
 void Camera::Jump()
 {
-	printf("in jump");
 	if (!jumping)
 	{
+		// stop player from inputting jump until jumping is false
 		jumpTimer = 10;
 		jumping = true;
 	}
+	else
+	{
+		// allow the player to start flying by double pressing space
+		if (flyingReady)
+		{
+			printf("flying now");
+			flying = true;
+		}
+	}
 	if (jumpTimer > 0)
 	{
+		// for 10 ticks, move the player upward from jumping force
 		jumpTimer -= 1;
-		printf("moving up ");
-		cameraPosition.y += 1.0 * jumpTimer/10;
+		cameraPosition.y += 0.8 * jumpTimer/10;
 	}
+}
 
-	//cameraPosition.y += 0.2 * magnitude;
-
+void Camera::Fly(float magnitude)
+{
+	// move player up and down if flying
+	if (flying)
+	{
+		cameraPosition.y += 0.1 * magnitude;
+	}
 }
 
 void Camera::Forward(float magnitude)
