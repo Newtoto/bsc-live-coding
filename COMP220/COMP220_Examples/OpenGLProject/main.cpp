@@ -339,7 +339,7 @@ int main(int argc, char* args[])
 
 		// Jumping
 		if (inputs.jump.GetValue() != 0 || playerCamera.jumping == true) {
-			playerCamera.Jump();  
+			playerCamera.Jump();
 		}
 		
 		// Listen for playerCamera fly events
