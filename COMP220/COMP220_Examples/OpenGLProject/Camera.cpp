@@ -57,7 +57,11 @@ void Camera::ApplyGravity(float groundHeight)
 		// only apply gravity when player is not flying
 		if (!flying)
 		{
-			fallTime += 9.8;
+			// Limit terminal velocity
+			if (fallTime < 1000)
+			{
+				fallTime += 9.8;
+			}
 			cameraPosition.y -= 0.001 * fallTime;
 		}
 	}
@@ -127,4 +131,19 @@ void Camera::Sideways(float magnitude)
 
 	cameraPosition.x += direction.z * magnitude * cameraSpeed;
 	cameraPosition.z -= direction.x * magnitude * cameraSpeed;
+}
+
+void Camera::AdjustMouseSensitivity(float magnitude)
+{
+	if (magnitude < 0 && mouseSensitivity > 0.001)
+	{
+		// Adjust mouse sensitivity down, but not below 0
+		mouseSensitivity += 0.001 * magnitude;
+	}
+	else if (magnitude > 0 && mouseSensitivity < 2)
+	{
+		mouseSensitivity += 0.001* magnitude;
+	}
+
+	printf("%", mouseSensitivity);
 }

@@ -233,15 +233,13 @@ int main(int argc, char* args[])
 				switch (event.key.keysym.sym)
 				{
 				case SDLK_UP:
-					// Increase mouse sensitivity
-					playerCamera.mouseSensitivity += 0.001;
+					// Start increasing mouse sensitivity
+					inputs.mouseSensitivity.SetPositive();
 					break;
 
 				case SDLK_DOWN:
-					// Decrease mouse sensitivity
-					if (playerCamera.mouseSensitivity > 0.001) {
-						playerCamera.mouseSensitivity -= 0.001;
-					}
+					// Start decreasing mouse sensitivity
+					inputs.mouseSensitivity.SetNegative();
 					break;
 
 				case SDLK_ESCAPE:
@@ -285,6 +283,16 @@ int main(int argc, char* args[])
 			{
 				switch (event.key.keysym.sym)
 				{
+				case SDLK_UP:
+					// Stop mouse sensitivity increasing
+					inputs.mouseSensitivity.ZeroPositive();
+					break;
+
+				case SDLK_DOWN:
+					// Stop mouse sensitivity decreasing
+					inputs.mouseSensitivity.ZeroNegative();
+					break;
+
 				case SDLK_w:
 					inputs.forward.ZeroPositive();
 					break;
@@ -330,6 +338,12 @@ int main(int argc, char* args[])
 		
 		// Listen for playerCamera fly events
 		playerCamera.Fly(inputs.fly.GetValue());
+
+		// Listen for mouse sensitivity adjustments
+		if (inputs.mouseSensitivity.GetValue() != 0)
+		{
+			playerCamera.AdjustMouseSensitivity(inputs.mouseSensitivity.GetValue());
+		}
 
 		currentTicks = SDL_GetTicks();
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;

@@ -23,6 +23,7 @@ public:
 	void Fly(float magnitude);
 	void Forward(float magnitude);
 	void Sideways(float magnitude);
+	void AdjustMouseSensitivity(float magnitude);
 	
 	glm::vec3 cameraPosition;
 
