@@ -21,6 +21,8 @@ Camera::Camera()
 
 	projectionMatrix = glm::perspective(glm::radians(90.0f), float(4 / 3), 0.1f, 100.0f);
 
+	fallTime = 0;
+
 	jumping = false;
 	flyingReady = false;
 	flying = false;
@@ -55,7 +57,8 @@ void Camera::ApplyGravity(float groundHeight)
 		// only apply gravity when player is not flying
 		if (!flying)
 		{
-			cameraPosition.y -= 0.1;
+			fallTime += 9.8;
+			cameraPosition.y -= 0.001 * fallTime;
 		}
 	}
 	else
@@ -64,6 +67,8 @@ void Camera::ApplyGravity(float groundHeight)
 		jumping = false;
 		flyingReady = false;
 		flying = false;
+
+		fallTime = 0;
 	}
 }
 
@@ -97,7 +102,15 @@ void Camera::Fly(float magnitude)
 	// move player up and down if flying
 	if (flying)
 	{
+		// Make player move faster
+		cameraSpeed = 0.25f;
+		// Move camera vertically by fly input magnitude
 		cameraPosition.y += 0.1 * magnitude;
+	}
+	else
+	{
+		// Make player speed normal
+		cameraSpeed = 0.1f;
 	}
 }
 

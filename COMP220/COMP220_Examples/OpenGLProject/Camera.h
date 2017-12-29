@@ -36,6 +36,8 @@ public:
 	float verticalAngle;
 	float headHeight;
 
+	float fallTime;
+
 	float jumpTimer;
 	bool jumping;
 	bool flyingReady;
