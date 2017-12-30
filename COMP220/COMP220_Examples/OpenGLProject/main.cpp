@@ -93,7 +93,7 @@ int main(int argc, char* args[])
 	// Create game object list
 	std::vector<GameObject*> gameObjectList;
 
-	// Create tank 1
+	// Create tank
 	GameObject * pTank = new GameObject();
 	pTank->SetPosition(vec3(10.0f, 0.0f, 0.0f));
 	pTank->LoadMeshesFromFile("Tank1.FBX");
@@ -101,11 +101,11 @@ int main(int argc, char* args[])
 	pTank->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
 	gameObjectList.push_back(pTank);
 
-	// Create tank 2
+	// Create car
 	pTank = new GameObject();
 	pTank->SetPosition(vec3(12.0f, 30.0f, 0.0f));
-	pTank->LoadMeshesFromFile("Tank1.FBX");
-	pTank->LoadDiffuseTextureFromFile("Tank1DF.png");
+	pTank->LoadMeshesFromFile("armoredrecon.fbx");
+	pTank->LoadDiffuseTextureFromFile("armoredrecon_diff.png");
 	pTank->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
 	gameObjectList.push_back(pTank);
 
