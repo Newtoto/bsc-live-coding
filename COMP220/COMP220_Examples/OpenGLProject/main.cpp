@@ -91,16 +91,23 @@ int main(int argc, char* args[])
 	vec4 specularLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Create game object list
-	std::vector<GameObject*> m_GameObjectList;
+	std::vector<GameObject*> gameObjectList;
 
-	// Create tank
+	// Create tank 1
 	GameObject * pTank = new GameObject();
+	pTank->SetPosition(vec3(10.0f, 0.0f, 0.0f));
 	pTank->LoadMeshesFromFile("Tank1.FBX");
 	pTank->LoadDiffuseTextureFromFile("Tank1DF.png");
 	pTank->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
+	gameObjectList.push_back(pTank);
 
-	m_GameObjectList.push_back(pTank);
-	
+	// Create tank 2
+	pTank = new GameObject();
+	pTank->SetPosition(vec3(12.0f, 30.0f, 0.0f));
+	pTank->LoadMeshesFromFile("Tank1.FBX");
+	pTank->LoadDiffuseTextureFromFile("Tank1DF.png");
+	pTank->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
+	gameObjectList.push_back(pTank);
 
 	// Color buffer texture
 	GLuint colorBufferID = CreateTexture(windowWidth, windowHeight);
@@ -189,9 +196,12 @@ int main(int argc, char* args[])
 	//add the body to the dynamics world
 	dynamicsWorld->addRigidBody(groundRigidBody);
 
-	// Create tank collision
-	pTank->CreateRigidBody();
-	dynamicsWorld->addRigidBody(pTank->m_rigidBody);
+	// Create GameObject collisions
+	for (GameObject * pObj : gameObjectList)
+	{
+		pObj->CreateRigidBody();
+		dynamicsWorld->addRigidBody(pObj->m_rigidBody);
+	}
 
 	glEnable(GL_DEPTH_TEST);
 	int lastTicks = SDL_GetTicks();
@@ -216,6 +226,16 @@ int main(int argc, char* args[])
 			{
 				switch (event.key.keysym.sym)
 				{
+				case SDLK_t:
+					pTank = new GameObject();
+					pTank->SetPosition(vec3(10.0f, 40.0f, 0.0f));
+					pTank->LoadMeshesFromFile("Tank1.FBX");
+					pTank->LoadDiffuseTextureFromFile("Tank1DF.png");
+					pTank->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
+					gameObjectList.push_back(pTank);
+
+					pTank->CreateRigidBody();
+					dynamicsWorld->addRigidBody(pTank->m_rigidBody);
 				case SDLK_UP:
 					// Start increasing mouse sensitivity
 					inputs.mouseSensitivity.SetPositive();
@@ -348,8 +368,11 @@ int main(int argc, char* args[])
 		playerCamera.MoveView(windowWidth, windowHeight);
 		playerCamera.ApplyGravity(groundTransform.getOrigin().getY() + 3.0f);
 
-		//Recalculate object position
-		pTank->Update();
+		// Recalculate GameObject positions
+		for (GameObject * pObj : gameObjectList)
+		{
+			pObj->Update();
+		}
 
 		glEnable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
@@ -359,35 +382,33 @@ int main(int argc, char* args[])
 		glClearDepth(1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-		pTank->PreRender();
+		// Draw all GameObjects
+		for (GameObject * pObj : gameObjectList)
+		{
+			pObj->PreRender();
 
-		GLuint currentProgramID = pTank->GetShaderProgramID();
+			GLuint currentProgramID = pObj->GetShaderProgramID();
 
-		// Retrieve shader values
-		GLint viewMatrixLocation = glGetUniformLocation(currentProgramID, "viewMatrix");
-		GLint projectionMatrixLocation = glGetUniformLocation(currentProgramID, "projectionMatrix");
-		GLint lightDirectionLocation = glGetUniformLocation(currentProgramID, "lightDirection");
-		GLint ambientLightColorLocation = glGetUniformLocation(currentProgramID, "ambientLightColor");
-		GLint diffuseLightColorLocation = glGetUniformLocation(currentProgramID, "diffuseLightColor");
-		GLint specularLightColorLocation = glGetUniformLocation(currentProgramID, "specularLightColor");
+			// Retrieve shader values
+			GLint viewMatrixLocation = glGetUniformLocation(currentProgramID, "viewMatrix");
+			GLint projectionMatrixLocation = glGetUniformLocation(currentProgramID, "projectionMatrix");
+			GLint lightDirectionLocation = glGetUniformLocation(currentProgramID, "lightDirection");
+			GLint ambientLightColorLocation = glGetUniformLocation(currentProgramID, "ambientLightColor");
+			GLint diffuseLightColorLocation = glGetUniformLocation(currentProgramID, "diffuseLightColor");
+			GLint specularLightColorLocation = glGetUniformLocation(currentProgramID, "specularLightColor");
 
-		// Send shader values
-		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.viewMatrix));
-		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.projectionMatrix));
+			// Send shader values
+			glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.viewMatrix));
+			glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.projectionMatrix));
 
-		glUniform3fv(lightDirectionLocation, 1, value_ptr(lightDirection));
-		glUniform4fv(ambientLightColorLocation, 1, value_ptr(ambientLightColor));
-		glUniform4fv(diffuseLightColorLocation, 1, value_ptr(diffuseLightColor));
-		glUniform4fv(specularLightColorLocation, 1, value_ptr(specularLightColor));
+			glUniform3fv(lightDirectionLocation, 1, value_ptr(lightDirection));
+			glUniform4fv(ambientLightColorLocation, 1, value_ptr(ambientLightColor));
+			glUniform4fv(diffuseLightColorLocation, 1, value_ptr(diffuseLightColor));
+			glUniform4fv(specularLightColorLocation, 1, value_ptr(specularLightColor));
 
-		//// Lighting
-		//light.UseUniformLocations(pTank->GetShaderProgramID());
-
-		//// Material
-		//material.UseUniformLocations(tank.GetShaderProgramID, light);
-		
-		//Draw the tank
-		pTank->Render();
+			//Draw the object
+			pObj->Render();
+		}
 
 		glDisable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -410,8 +431,19 @@ int main(int argc, char* args[])
 		lastTicks = currentTicks;
 	}
 	
-	// Remove tank from world
-	dynamicsWorld->removeRigidBody(pTank->m_rigidBody);
+	auto gameObjectIter = gameObjectList.begin();
+	while (gameObjectIter != gameObjectList.end())
+	{
+		if ((*gameObjectIter))
+		{
+			// Remove GameObjects from physics world
+			dynamicsWorld->removeRigidBody((*gameObjectIter)->m_rigidBody);
+
+			(*gameObjectIter)->Destroy();
+			delete (*gameObjectIter);
+			gameObjectIter = gameObjectList.erase(gameObjectIter);
+		}
+	}
 
 	dynamicsWorld->removeRigidBody(groundRigidBody);
 	// Delete ground
@@ -433,13 +465,6 @@ int main(int argc, char* args[])
 	delete dispatcher;
 
 	delete collisionConfiguration;
-
-	if (pTank)
-	{
-		pTank->Destroy();
-		delete pTank;
-		pTank = nullptr;
-	}
 
 	// Delete post processing from memory
 	glDeleteProgram(postProcessingProgramID);
