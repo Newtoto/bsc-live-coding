@@ -1,19 +1,41 @@
 #include "GameObject.h"
 
-GameObject::GameObject(glm::vec3 position, glm::vec3 scale, glm::vec3 rotation)
+GameObject::GameObject()
 {
-	objectPosition = position;
-	objectScale = scale;
-	objectRotation = rotation;
+	m_position = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_modelMatrix = glm::mat4(1.0f);
 
-	LoadMeshFromFile("Tank1.FBX", meshes);
-	textureID = LoadTextureFromFile("Tank1DF.png");
+	m_diffuseMap = 0;
 
-	programID = LoadShaders("lightingVert.glsl", "lightingFrag.glsl");
+	m_ambientMaterialColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
+	m_diffuseMaterialColor = glm::vec4(0.6f, 0.6f, 0.6f, 1.0f);
+	m_specularMaterialColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_specularPower = 25.0f;
+	m_shaderProgramID = 0;
 }
 
 GameObject::~GameObject()
 {
+}
+
+// Create game object mesh from file
+void GameObject::LoadMeshesFromFile(const std::string& filename)
+{
+	LoadMeshFromFile(filename, m_meshes);
+}
+
+// Create game object texture from file
+void GameObject::LoadDiffuseTextureFromFile(const std::string& filename)
+{
+	m_diffuseMap = LoadTextureFromFile(filename);
+}
+
+// Create game object shader program from files
+void GameObject::LoadShaderProgram(const std::string& vertexShaderFilename, const std::string& fragmentShaderFilename)
+{
+	m_shaderProgramID = LoadShaders(vertexShaderFilename.c_str(), fragmentShaderFilename.c_str());
 }
 
 void GameObject::CreateRigidBody()
@@ -22,7 +44,7 @@ void GameObject::CreateRigidBody()
 	objectColShape = new btBoxShape(btVector3(2, 2, 2));
 	// Create Dynamic Objects
 	objectTransform.setIdentity();
-	objectTransform.setOrigin(btVector3(objectPosition.x, objectPosition.y, objectPosition.z));
+	objectTransform.setOrigin(btVector3(m_position.x, m_position.y, m_position.z));
 	btVector3 objectInertia(0, 0, 0);
 
 	btScalar objectMass(1.f);
@@ -31,65 +53,38 @@ void GameObject::CreateRigidBody()
 
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(objectTransform);
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(objectMass, myMotionState, objectColShape, objectInertia);
-	objectRigidBody = new btRigidBody(rbInfo);
+	m_rigidBody = new btRigidBody(rbInfo);
 }
 
-void GameObject::CreateUniformLocations()
+void GameObject::PreRender()
 {
-	fragColorLocation = glGetUniformLocation(programID, "fragColor");
-	if (fragColorLocation < 0)
-	{
-		printf("Unable to find %s uniform", "fragColor");
-	}
+	glUseProgram(m_shaderProgramID);
 
-	currentTimeLocation = glGetUniformLocation(programID, "time");
-	if (currentTimeLocation < 0)
-	{
-		printf("Unable to find %s uniform", "time");
-	}
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_diffuseMap);
 
-	modelMatrixLocation = glGetUniformLocation(programID, "modelMatrix");
-	if (modelMatrixLocation < 0)
-	{
-		printf("Unable to find %s uniform", "modelMatrix");
-	}
-	viewMatrixLocation = glGetUniformLocation(programID, "viewMatrix");
-	if (viewMatrixLocation < 0)
-	{
-		printf("Unable to find %s uniform", "viewMatrix");
-	}
-	projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
-	if (projectionMatrixLocation < 0)
-	{
-		printf("Unable to find %s uniform", "projectionMatrix");
-	}
-	textureLocation = glGetUniformLocation(programID, "baseTexture");
-	if (textureLocation < 0)
-	{
-		printf("Unable to find %s uniform", "baseTexture");
-	}
-	cameraPositionLocation = glGetUniformLocation(programID, "cameraPosition");
-	if (cameraPositionLocation < 0)
-	{
-		printf("Unable to find %s uniform", "cameraPosition");
-	}
-}
+	GLint modelMatrixLocation = glGetUniformLocation(m_shaderProgramID, "modelMatrix");
+	GLint textureLocation = glGetUniformLocation(m_shaderProgramID, "baseTexture");
 
-void GameObject::UseUniformLocations(float currentTicks, Camera playerCamera)
-{
-	glUniform1f(currentTimeLocation, (float)(currentTicks) / 1000.0f);
+	ambientMaterialColorLocation = glGetUniformLocation(m_shaderProgramID, "ambientMaterialColor");
+	diffuseMaterialColorLocation = glGetUniformLocation(m_shaderProgramID, "diffuseMaterialColor");
+	specularMaterialColorLocation = glGetUniformLocation(m_shaderProgramID, "specularMaterialColor");
+	specularPowerLocation = glGetUniformLocation(m_shaderProgramID, "specularPower");
 
-	glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(modelMatrix));
-	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.viewMatrix));
-	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.projectionMatrix));
+	glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(m_modelMatrix));
 
-	glUniform3fv(cameraPositionLocation, 1, value_ptr(playerCamera.cameraPosition));
 	glUniform1i(textureLocation, 0);
+
+	glUniformMatrix4fv(ambientMaterialColorLocation, 1, GL_FALSE, value_ptr(m_ambientMaterialColor));
+	glUniformMatrix4fv(diffuseMaterialColorLocation, 1, GL_FALSE, value_ptr(m_diffuseMaterialColor));
+	glUniformMatrix4fv(specularMaterialColorLocation, 1, GL_FALSE, value_ptr(m_specularMaterialColor));
+	glUniform1f(specularPowerLocation, m_specularPower);
+
 }
 
-void GameObject::Draw()
+void GameObject::Render()
 {
-	for (Mesh *currentMesh : meshes)
+	for (Mesh *currentMesh : m_meshes)
 	{
 		currentMesh->Render();
 	}
@@ -97,46 +92,49 @@ void GameObject::Draw()
 
 void GameObject::Update()
 {
-	if (objectRigidBody)
+	if (m_rigidBody)
 	{
 		// Update physics
-		objectTransform = objectRigidBody->getWorldTransform();
+		objectTransform = m_rigidBody->getWorldTransform();
 		objectOrigin = objectTransform.getOrigin();
 		objectPhysicsRotation = objectTransform.getRotation();
 
-		objectPosition = glm::vec3(objectOrigin.getX(), objectOrigin.getY(), objectOrigin.getZ());
+		m_position = glm::vec3(objectOrigin.getX(), objectOrigin.getY(), objectOrigin.getZ());
 	}
 
-	rotationMatrix = rotate(objectRotation.x, glm::vec3(1.0f, 0.0f, 0.0f))*rotate(objectRotation.y, glm::vec3(0.0f, 1.0f, 0.0f))*rotate(objectRotation.z, glm::vec3(1.0f, 0.0f, 1.0f));
-	scaleMatrix = scale(objectScale);
-	translationMatrix = translate(objectPosition);
+	m_rotationMatrix = rotate(m_rotation.x, glm::vec3(1.0f, 0.0f, 0.0f))*rotate(m_rotation.y, glm::vec3(0.0f, 1.0f, 0.0f))*rotate(m_rotation.z, glm::vec3(1.0f, 0.0f, 1.0f));
+	m_scaleMatrix = scale(m_scale);
+	m_translationMatrix = translate(m_position);
 
-	modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
+	m_modelMatrix = m_translationMatrix * m_rotationMatrix * m_scaleMatrix;
 }
 
 void GameObject::Destroy()
 {
 	// Delete rigid body
 	delete objectColShape;
-	delete objectRigidBody->getMotionState();
-	delete objectRigidBody;
+	delete m_rigidBody->getMotionState();
+	delete m_rigidBody;
+
+	// Delete diffuse map memory
+	glDeleteTextures(1, &m_diffuseMap);
+
+	// Delete program ID memory
+	glDeleteProgram(m_shaderProgramID);
 
 	// Delete meshes
-	auto iter = meshes.begin();
-	while (iter != meshes.end())
+	auto iter = m_meshes.begin();
+	while (iter != m_meshes.end())
 	{
 		if ((*iter))
 		{
 			delete (*iter);
-			iter = meshes.erase(iter);
+			iter = m_meshes.erase(iter);
 		}
 		else
 		{
 			iter++;
 		}
 	}
-	meshes.clear();
-
-	glDeleteTextures(1, &textureID);
-	glDeleteProgram(programID);
+	m_meshes.clear();
 }

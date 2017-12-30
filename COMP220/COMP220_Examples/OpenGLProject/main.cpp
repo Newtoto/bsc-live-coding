@@ -80,22 +80,34 @@ int main(int argc, char* args[])
 		QuitSDL();
 	}
 
-	// Add tanks
-	GameObject tank(vec3(10.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f));
-	tank.Update();
-
-	// Second tank
-	GameObject secondTank(vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f));
-	secondTank.Update();
-
 	// Add camera
 	Camera playerCamera;
 
 	// Lighting
-	Lighting light;
+	//Lighting light;
+	vec4 ambientLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	vec3 lightDirection = vec3(0.0f, 0.0f, 1.0f);
+	vec4 diffuseLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	vec4 specularLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	// Material
-	Material material;
+	// Create game object list
+	std::vector<GameObject*> gameObjectList;
+
+	// Create tank
+	GameObject * pTank = new GameObject();
+	pTank->SetPosition(vec3(10.0f, 0.0f, 0.0f));
+	pTank->LoadMeshesFromFile("Tank1.FBX");
+	pTank->LoadDiffuseTextureFromFile("Tank1DF.png");
+	pTank->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
+	gameObjectList.push_back(pTank);
+
+	// Create car
+	pTank = new GameObject();
+	pTank->SetPosition(vec3(12.0f, 30.0f, 0.0f));
+	pTank->LoadMeshesFromFile("armoredrecon.fbx");
+	pTank->LoadDiffuseTextureFromFile("armoredrecon_diff.png");
+	pTank->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
+	gameObjectList.push_back(pTank);
 
 	// Color buffer texture
 	GLuint colorBufferID = CreateTexture(windowWidth, windowHeight);
@@ -146,21 +158,6 @@ int main(int argc, char* args[])
 		printf("Unable to find %s uniform", "texture0");
 	}
 
-	//Create and compile GLSL program from shaders
-
-	tank.CreateUniformLocations();
-	secondTank.CreateUniformLocations();
-
-	static const GLfloat fragColor[] = { 0.0f, 1.0f, 0.0f, 1.0f };
-
-	// Lighting
-	light.InitialiseUniformLocations(tank.programID);
-	light.InitialiseUniformLocations(secondTank.programID);
-
-	// Material
-	material.InitialiseUniformLocations(tank.programID);
-	material.InitialiseUniformLocations(secondTank.programID);
-
 	///-----bullet initialization_start-----
 
 	///collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
@@ -199,19 +196,16 @@ int main(int argc, char* args[])
 	//add the body to the dynamics world
 	dynamicsWorld->addRigidBody(groundRigidBody);
 
-	// Create tank collision
-	tank.CreateRigidBody();
-	dynamicsWorld->addRigidBody(tank.objectRigidBody);
-
-	// Second tank collision
-	secondTank.CreateRigidBody();
-	dynamicsWorld->addRigidBody(secondTank.objectRigidBody);
+	// Create GameObject collisions
+	for (GameObject * pObj : gameObjectList)
+	{
+		pObj->CreateRigidBody();
+		dynamicsWorld->addRigidBody(pObj->m_rigidBody);
+	}
 
 	glEnable(GL_DEPTH_TEST);
 	int lastTicks = SDL_GetTicks();
 	int currentTicks = SDL_GetTicks();
-
-
 
 	SDL_WarpMouseInWindow(window, windowWidth / 2, windowHeight / 2);
 
@@ -232,6 +226,16 @@ int main(int argc, char* args[])
 			{
 				switch (event.key.keysym.sym)
 				{
+				case SDLK_t:
+					pTank = new GameObject();
+					pTank->SetPosition(vec3(10.0f, 40.0f, 0.0f));
+					pTank->LoadMeshesFromFile("Tank1.FBX");
+					pTank->LoadDiffuseTextureFromFile("Tank1DF.png");
+					pTank->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
+					gameObjectList.push_back(pTank);
+
+					pTank->CreateRigidBody();
+					dynamicsWorld->addRigidBody(pTank->m_rigidBody);
 				case SDLK_UP:
 					// Start increasing mouse sensitivity
 					inputs.mouseSensitivity.SetPositive();
@@ -364,9 +368,11 @@ int main(int argc, char* args[])
 		playerCamera.MoveView(windowWidth, windowHeight);
 		playerCamera.ApplyGravity(groundTransform.getOrigin().getY() + 3.0f);
 
-		//Recalculate object position
-		tank.Update();
-		secondTank.Update();
+		// Recalculate GameObject positions
+		for (GameObject * pObj : gameObjectList)
+		{
+			pObj->Update();
+		}
 
 		glEnable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
@@ -376,38 +382,33 @@ int main(int argc, char* args[])
 		glClearDepth(1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tank.textureID);
+		// Draw all GameObjects
+		for (GameObject * pObj : gameObjectList)
+		{
+			pObj->PreRender();
 
-		glUseProgram(tank.programID);
-		glUniform4fv(tank.fragColorLocation, 1, fragColor);
-		tank.UseUniformLocations(currentTicks, playerCamera);
+			GLuint currentProgramID = pObj->GetShaderProgramID();
 
-		// Lighting
-		light.UseUniformLocations(tank.programID);
+			// Retrieve shader values
+			GLint viewMatrixLocation = glGetUniformLocation(currentProgramID, "viewMatrix");
+			GLint projectionMatrixLocation = glGetUniformLocation(currentProgramID, "projectionMatrix");
+			GLint lightDirectionLocation = glGetUniformLocation(currentProgramID, "lightDirection");
+			GLint ambientLightColorLocation = glGetUniformLocation(currentProgramID, "ambientLightColor");
+			GLint diffuseLightColorLocation = glGetUniformLocation(currentProgramID, "diffuseLightColor");
+			GLint specularLightColorLocation = glGetUniformLocation(currentProgramID, "specularLightColor");
 
-		// Material
-		material.UseUniformLocations(tank.programID, light);
-		
-		//Draw the triangle
-		tank.Draw();
+			// Send shader values
+			glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.viewMatrix));
+			glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.projectionMatrix));
 
-		// Second tank
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, secondTank.textureID);
+			glUniform3fv(lightDirectionLocation, 1, value_ptr(lightDirection));
+			glUniform4fv(ambientLightColorLocation, 1, value_ptr(ambientLightColor));
+			glUniform4fv(diffuseLightColorLocation, 1, value_ptr(diffuseLightColor));
+			glUniform4fv(specularLightColorLocation, 1, value_ptr(specularLightColor));
 
-		glUseProgram(secondTank.programID);
-		glUniform4fv(secondTank.fragColorLocation, 1, fragColor);
-		tank.UseUniformLocations(currentTicks, playerCamera);
-
-		// Lighting
-		light.UseUniformLocations(secondTank.programID);
-
-		// Material
-		material.UseUniformLocations(secondTank.programID, light);
-
-		//Draw the triangle
-		secondTank.Draw();
+			//Draw the object
+			pObj->Render();
+		}
 
 		glDisable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -430,12 +431,19 @@ int main(int argc, char* args[])
 		lastTicks = currentTicks;
 	}
 	
-	// Destroy models
-	dynamicsWorld->removeRigidBody(tank.objectRigidBody);
-	tank.Destroy();
+	auto gameObjectIter = gameObjectList.begin();
+	while (gameObjectIter != gameObjectList.end())
+	{
+		if ((*gameObjectIter))
+		{
+			// Remove GameObjects from physics world
+			dynamicsWorld->removeRigidBody((*gameObjectIter)->m_rigidBody);
 
-	dynamicsWorld->removeRigidBody(secondTank.objectRigidBody);
-	secondTank.Destroy();
+			(*gameObjectIter)->Destroy();
+			delete (*gameObjectIter);
+			gameObjectIter = gameObjectList.erase(gameObjectIter);
+		}
+	}
 
 	dynamicsWorld->removeRigidBody(groundRigidBody);
 	// Delete ground
