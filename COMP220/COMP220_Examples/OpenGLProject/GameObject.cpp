@@ -63,8 +63,8 @@ void GameObject::PreRender()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_diffuseMap);
 
-	GLint modelMatrixLocation = glGetUniformLocation(m_shaderProgramID, "modelMatrix");
-	GLint textureLocation = glGetUniformLocation(m_shaderProgramID, "baseTexture");
+	modelMatrixLocation = glGetUniformLocation(m_shaderProgramID, "modelMatrix");
+	textureLocation = glGetUniformLocation(m_shaderProgramID, "baseTexture");
 
 	ambientMaterialColorLocation = glGetUniformLocation(m_shaderProgramID, "ambientMaterialColor");
 	diffuseMaterialColorLocation = glGetUniformLocation(m_shaderProgramID, "diffuseMaterialColor");

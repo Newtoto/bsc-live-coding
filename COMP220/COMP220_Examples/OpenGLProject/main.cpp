@@ -80,16 +80,6 @@ int main(int argc, char* args[])
 		QuitSDL();
 	}
 
-	// Add camera
-	Camera playerCamera;
-
-	// Lighting
-	//Lighting light;
-	vec4 ambientLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	vec3 lightDirection = vec3(0.0f, 0.0f, 1.0f);
-	vec4 diffuseLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	vec4 specularLightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-
 	// Create game object list
 	std::vector<GameObject*> gameObjectList;
 
@@ -98,7 +88,7 @@ int main(int argc, char* args[])
 	pTank->SetPosition(vec3(10.0f, 0.0f, 0.0f));
 	pTank->LoadMeshesFromFile("Tank1.FBX");
 	pTank->LoadDiffuseTextureFromFile("Tank1DF.png");
-	pTank->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
+	pTank->LoadShaderProgram("lightingVert.glsl", "lightingFrag.glsl");
 	gameObjectList.push_back(pTank);
 
 	// Create car
@@ -106,8 +96,17 @@ int main(int argc, char* args[])
 	pTank->SetPosition(vec3(12.0f, 30.0f, 0.0f));
 	pTank->LoadMeshesFromFile("armoredrecon.fbx");
 	pTank->LoadDiffuseTextureFromFile("armoredrecon_diff.png");
-	pTank->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
+	pTank->LoadShaderProgram("lightingVert.glsl", "lightingFrag.glsl");
 	gameObjectList.push_back(pTank);
+
+	// Add camera
+	Camera playerCamera;
+
+	// Lighting
+	Lighting light;
+
+	// Material
+	Material material;
 
 	// Color buffer texture
 	GLuint colorBufferID = CreateTexture(windowWidth, windowHeight);
@@ -392,19 +391,16 @@ int main(int argc, char* args[])
 			// Retrieve shader values
 			GLint viewMatrixLocation = glGetUniformLocation(currentProgramID, "viewMatrix");
 			GLint projectionMatrixLocation = glGetUniformLocation(currentProgramID, "projectionMatrix");
-			GLint lightDirectionLocation = glGetUniformLocation(currentProgramID, "lightDirection");
-			GLint ambientLightColorLocation = glGetUniformLocation(currentProgramID, "ambientLightColor");
-			GLint diffuseLightColorLocation = glGetUniformLocation(currentProgramID, "diffuseLightColor");
-			GLint specularLightColorLocation = glGetUniformLocation(currentProgramID, "specularLightColor");
-
+			light.InitialiseUniformLocations(currentProgramID);
+			// Material
+			material.InitialiseUniformLocations(currentProgramID);
+			
 			// Send shader values
 			glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.viewMatrix));
 			glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(playerCamera.projectionMatrix));
 
-			glUniform3fv(lightDirectionLocation, 1, value_ptr(lightDirection));
-			glUniform4fv(ambientLightColorLocation, 1, value_ptr(ambientLightColor));
-			glUniform4fv(diffuseLightColorLocation, 1, value_ptr(diffuseLightColor));
-			glUniform4fv(specularLightColorLocation, 1, value_ptr(specularLightColor));
+			light.UseUniformLocations();
+			material.UseUniformLocations(currentProgramID);
 
 			//Draw the object
 			pObj->Render();

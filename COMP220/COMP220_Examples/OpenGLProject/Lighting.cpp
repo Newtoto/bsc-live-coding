@@ -45,10 +45,8 @@ void Lighting::InitialiseUniformLocations(GLuint programID) {
 	}
 }
 
-void Lighting::UseUniformLocations(GLuint programID)
+void Lighting::UseUniformLocations()
 {
-	glUseProgram(programID);
-
 	glUniform3fv(lightDirectionLocation, 1, value_ptr(direction));
 	glUniform4fv(ambientLightColorLocation, 1, value_ptr(ambientColor));
 	glUniform4fv(diffuseLightColorLocation, 1, value_ptr(diffuseColor));

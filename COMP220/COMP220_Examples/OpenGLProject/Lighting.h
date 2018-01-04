@@ -12,7 +12,7 @@ public:
 	~Lighting();
 
 	void InitialiseUniformLocations(GLuint programID);
-	void UseUniformLocations(GLuint programID);
+	void UseUniformLocations();
 
 	glm::vec3 direction;
 	glm::vec4 ambientColor;

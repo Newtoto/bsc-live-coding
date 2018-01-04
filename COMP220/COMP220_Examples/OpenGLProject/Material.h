@@ -5,8 +5,6 @@
 #include <GL\glew.h>
 #include <glm\gtc\type_ptr.hpp>
 
-#include "Lighting.h"
-
 class Material
 {
 public:
@@ -14,11 +12,12 @@ public:
 	~Material();
 
 	void InitialiseUniformLocations(GLuint programID);
-	void UseUniformLocations(GLuint programID, Lighting light);
+	void UseUniformLocations(GLuint programID);
 
 	glm::vec4 ambientMaterialColor;
 	glm::vec4 diffuseMaterialColor;
 	glm::vec4 specualarMaterialColor;
+	float specularPower;
 
 	GLint ambientMaterialColorLocation;
 	GLint diffuseMaterialColorLocation;

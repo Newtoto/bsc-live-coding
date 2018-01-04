@@ -32,11 +32,9 @@ void Material::InitialiseUniformLocations(GLuint programID) {
 	}
 }
 
-void Material::UseUniformLocations(GLuint programID, Lighting light)
+void Material::UseUniformLocations(GLuint programID)
 {
-	glUseProgram(programID);
-
 	glUniform4fv(ambientMaterialColorLocation, 1, value_ptr(ambientMaterialColor));
 	glUniform4fv(diffuseMaterialColorLocation, 1, value_ptr(diffuseMaterialColor));
-	glUniform4fv(specularMaterialColorLocation, 1, value_ptr(light.specularColor));
+	glUniform4fv(specularMaterialColorLocation, 1, value_ptr(specualarMaterialColor));
 }

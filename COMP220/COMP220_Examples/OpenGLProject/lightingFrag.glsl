@@ -14,4 +14,6 @@ uniform sampler2D baseTexture;
 
 void main(){
 	color = ambient + (diffuse*texture(baseTexture, vertexTextureCoordOut)) + specular;
+	//color = ambient + (diffuse*texture(baseTexture, vertexTextureCoordOut)) + specular;
+	//color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
 }
