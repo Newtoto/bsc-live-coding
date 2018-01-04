@@ -277,6 +277,17 @@ int main(int argc, char* args[])
 				case SDLK_f:
 					// enable fly
 					playerCamera.flying = true;
+					break;
+
+				case SDLK_r:
+					// Reset post processing
+					postProcessingProgramID = LoadShaders("passThroughVert.glsl", "postTextureFrag.glsl");
+					break;
+
+				case SDLK_b:
+					// Black and white post processing
+					postProcessingProgramID = LoadShaders("passThroughVert.glsl", "postBlackAndwhite.glsl");
+					break;
 
 				default:
 					break;

@@ -14,7 +14,7 @@ float getLuminescence(vec3 color)
 void main(){
 	vec4 textureColor = texture(texture0, textureCoordsOut);
 	float luminescence = getLuminescence(textureColor.rgb);
-	if (luminescence < 0.12)
+	if (luminescence < 0.08)
 	{
 		color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	}
