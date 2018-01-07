@@ -2,7 +2,9 @@
 
 #include "main.h"
 
-void LoadImageSupport() {
+
+void LoadImageSupport()
+{
 	int flags = IMG_INIT_JPG | IMG_INIT_PNG;
 	int initted = IMG_Init(flags);
 	if ((initted&flags) != flags)
@@ -12,14 +14,16 @@ void LoadImageSupport() {
 	}
 }
 
-void RequestCoreOpenGL(int majorVersion, int minorVersion) {
+void RequestCoreOpenGL(int majorVersion, int minorVersion)
+{
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minorVersion);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 }
 
-int InitialiseSDLWindowAndOpenGL(int windowWidth, int windowHeight) {
+int InitialiseSDLWindowAndOpenGL(int windowWidth, int windowHeight)
+{
 	// load support for JPG and PNG image formats (tiffs also supported, but not checked)
 	LoadImageSupport();
 	//Request 3.1 core OpenGL
@@ -61,7 +65,8 @@ int InitialiseSDLWindowAndOpenGL(int windowWidth, int windowHeight) {
 	return 0;
 }
 
-void QuitSDL() {
+void QuitSDL()
+{
 	// Clean up
 	SDL_GL_DeleteContext(glContext);
 	SDL_DestroyWindow(window);
@@ -84,20 +89,22 @@ int main(int argc, char* args[])
 	std::vector<GameObject*> gameObjectList;
 
 	// Create tank
-	GameObject * pTank = new GameObject();
-	pTank->SetPosition(vec3(10.0f, 0.0f, 0.0f));
-	pTank->LoadMeshesFromFile("Tank1.FBX");
-	pTank->LoadDiffuseTextureFromFile("Tank1DF.png");
-	pTank->LoadShaderProgram("lightingVert.glsl", "lightingFrag.glsl");
-	gameObjectList.push_back(pTank);
+	GameObject * pObject = new GameObject();
+	pObject->SetPosition(vec3(0.0f, 0.0f, 0.0f));
+	pObject->SetRotation(vec3(0.0f, 3.1f, 0.0f));
+	pObject->LoadMeshesFromFile("Tank1.FBX");
+	pObject->LoadDiffuseTextureFromFile("Tank1DF.png");
+	pObject->LoadShaderProgram("lightingVert.glsl", "lightingFrag.glsl");
+	gameObjectList.push_back(pObject);
 
 	// Create car
-	pTank = new GameObject();
-	pTank->SetPosition(vec3(12.0f, 30.0f, 0.0f));
-	pTank->LoadMeshesFromFile("armoredrecon.fbx");
-	pTank->LoadDiffuseTextureFromFile("armoredrecon_diff.png");
-	pTank->LoadShaderProgram("lightingVert.glsl", "lightingFrag.glsl");
-	gameObjectList.push_back(pTank);
+	pObject = new GameObject();
+	pObject->SetPosition(vec3(40.0f, 0.0f, 0.0f));
+	//pObject->SetRotation(vec3(0.0f, 0.0f, 0.0f));
+	pObject->LoadMeshesFromFile("armoredrecon.fbx");
+	pObject->LoadDiffuseTextureFromFile("armoredrecon_diff.png");
+	pObject->LoadShaderProgram("lightingVert.glsl", "lightingFrag.glsl");
+	gameObjectList.push_back(pObject);
 
 	// Add camera
 	Camera playerCamera;
@@ -195,6 +202,11 @@ int main(int argc, char* args[])
 	//add the body to the dynamics world
 	dynamicsWorld->addRigidBody(groundRigidBody);
 
+	// Game values
+	int correctGuess = rand() % 10;
+	int playerScore = 0;
+	bool gameOver = false;
+
 	// Create GameObject collisions
 	for (GameObject * pObj : gameObjectList)
 	{
@@ -226,15 +238,15 @@ int main(int argc, char* args[])
 				switch (event.key.keysym.sym)
 				{
 				case SDLK_t:
-					pTank = new GameObject();
-					pTank->SetPosition(vec3(10.0f, 40.0f, 0.0f));
-					pTank->LoadMeshesFromFile("Tank1.FBX");
-					pTank->LoadDiffuseTextureFromFile("Tank1DF.png");
-					pTank->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
-					gameObjectList.push_back(pTank);
+					pObject = new GameObject();
+					pObject->SetPosition(vec3(10.0f, 40.0f, 0.0f));
+					pObject->LoadMeshesFromFile("Tank1.FBX");
+					pObject->LoadDiffuseTextureFromFile("Tank1DF.png");
+					pObject->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
+					gameObjectList.push_back(pObject);
 
-					pTank->CreateRigidBody();
-					dynamicsWorld->addRigidBody(pTank->m_rigidBody);
+					pObject->CreateRigidBody();
+					dynamicsWorld->addRigidBody(pObject->m_rigidBody);
 				case SDLK_UP:
 					// Start increasing mouse sensitivity
 					inputs.mouseSensitivity.SetPositive();
@@ -287,6 +299,348 @@ int main(int argc, char* args[])
 				case SDLK_b:
 					// Black and white post processing
 					postProcessingProgramID = LoadShaders("passThroughVert.glsl", "postBlackAndwhite.glsl");
+					break;
+
+				// Number inputs
+
+				case SDLK_0:
+					if (!gameOver) {
+						if (correctGuess == 0) {
+							// Set new target
+							correctGuess = rand() % 10;
+							// Move tank back
+							gameObjectList[0]->Move(btVector3(-1.0f, 0.0f, 0.0f));
+							// Increase score
+							playerScore += 1;
+							printf("Correct");
+						}
+						else
+						{
+							// Move tank forward
+							gameObjectList[0]->Move(btVector3(0.5f, 0.0f, 0.0f));
+							// Check tank is hitting car
+							if (gameObjectList[0]->m_rigidBody->getWorldTransform().getOrigin().getX() > 35.0f)
+							{
+								// Destroy car
+								dynamicsWorld->removeRigidBody(gameObjectList[1]->m_rigidBody);
+								gameObjectList[1]->Destroy();
+								// Remove array element
+								gameObjectList.erase(gameObjectList.begin() + 1);
+								printf("Game Over");
+								gameOver = true;
+							}
+							else
+							{
+								printf("Incorrect, don't get crushed now");
+							}
+						}
+					}
+					break;
+
+				case SDLK_1:
+					if (!gameOver) {
+						if (correctGuess == 1) {
+							// Set new target
+							correctGuess = rand() % 10;
+							// Move tank back
+							gameObjectList[0]->Move(btVector3(-1.0f, 0.0f, 0.0f));
+							// Increase score
+							playerScore += 1;
+							printf("Correct");
+						}
+						else
+						{
+							// Move tank forward
+							gameObjectList[0]->Move(btVector3(0.5f, 0.0f, 0.0f));
+							// Check tank is hitting car
+							if (gameObjectList[0]->m_rigidBody->getWorldTransform().getOrigin().getX() > 35.0f)
+							{
+								// Destroy car
+								dynamicsWorld->removeRigidBody(gameObjectList[1]->m_rigidBody);
+								gameObjectList[1]->Destroy();
+								// Remove array element
+								gameObjectList.erase(gameObjectList.begin() + 1);
+								printf("Game Over");
+								gameOver = true;
+							}
+							else
+							{
+								printf("Incorrect, don't get crushed now");
+							}
+						}
+					}
+					break;
+
+				case SDLK_2:
+					if (!gameOver) {
+						if (correctGuess == 2) {
+							// Set new target
+							correctGuess = rand() % 10;
+							// Move tank back
+							gameObjectList[0]->Move(btVector3(-1.0f, 0.0f, 0.0f));
+							// Increase score
+							playerScore += 1;
+							printf("Correct");
+						}
+						else
+						{
+							// Move tank forward
+							gameObjectList[0]->Move(btVector3(0.5f, 0.0f, 0.0f));
+							// Check tank is hitting car
+							if (gameObjectList[0]->m_rigidBody->getWorldTransform().getOrigin().getX() > 35.0f)
+							{
+								// Destroy car
+								dynamicsWorld->removeRigidBody(gameObjectList[1]->m_rigidBody);
+								gameObjectList[1]->Destroy();
+								// Remove array element
+								gameObjectList.erase(gameObjectList.begin() + 1);
+								printf("Game Over");
+								gameOver = true;
+							}
+							else
+							{
+								printf("Incorrect, don't get crushed now");
+							}
+						}
+					}
+					break;
+
+				case SDLK_3:
+					if (!gameOver) {
+						if (correctGuess == 3) {
+							// Set new target
+							correctGuess = rand() % 10;
+							// Move tank back
+							gameObjectList[0]->Move(btVector3(-1.0f, 0.0f, 0.0f));
+							// Increase score
+							playerScore += 1;
+							printf("Correct");
+						}
+						else
+						{
+							// Move tank forward
+							gameObjectList[0]->Move(btVector3(0.5f, 0.0f, 0.0f));
+							// Check tank is hitting car
+							if (gameObjectList[0]->m_rigidBody->getWorldTransform().getOrigin().getX() > 35.0f)
+							{
+								// Destroy car
+								dynamicsWorld->removeRigidBody(gameObjectList[1]->m_rigidBody);
+								gameObjectList[1]->Destroy();
+								// Remove array element
+								gameObjectList.erase(gameObjectList.begin() + 1);
+								printf("Game Over");
+								gameOver = true;
+							}
+							else
+							{
+								printf("Incorrect, don't get crushed now");
+							}
+						}
+					}
+					break;
+
+				case SDLK_4:
+					if (!gameOver) {
+						if (correctGuess == 4) {
+							// Set new target
+							correctGuess = rand() % 10;
+							// Move tank back
+							gameObjectList[0]->Move(btVector3(-1.0f, 0.0f, 0.0f));
+							// Increase score
+							playerScore += 1;
+							printf("Correct");
+						}
+						else
+						{
+							// Move tank forward
+							gameObjectList[0]->Move(btVector3(0.5f, 0.0f, 0.0f));
+							// Check tank is hitting car
+							if (gameObjectList[0]->m_rigidBody->getWorldTransform().getOrigin().getX() > 35.0f)
+							{
+								// Destroy car
+								dynamicsWorld->removeRigidBody(gameObjectList[1]->m_rigidBody);
+								gameObjectList[1]->Destroy();
+								// Remove array element
+								gameObjectList.erase(gameObjectList.begin() + 1);
+								printf("Game Over");
+								gameOver = true;
+							}
+							else
+							{
+								printf("Incorrect, don't get crushed now");
+							}
+						}
+					}
+					break;
+
+				case SDLK_5:
+					if (!gameOver) {
+						if (correctGuess == 5) {
+							// Set new target
+							correctGuess = rand() % 10;
+							// Move tank back
+							gameObjectList[0]->Move(btVector3(-1.0f, 0.0f, 0.0f));
+							// Increase score
+							playerScore += 1;
+							printf("Correct");
+						}
+						else
+						{
+							// Move tank forward
+							gameObjectList[0]->Move(btVector3(0.5f, 0.0f, 0.0f));
+							// Check tank is hitting car
+							if (gameObjectList[0]->m_rigidBody->getWorldTransform().getOrigin().getX() > 35.0f)
+							{
+								// Destroy car
+								dynamicsWorld->removeRigidBody(gameObjectList[1]->m_rigidBody);
+								gameObjectList[1]->Destroy();
+								// Remove array element
+								gameObjectList.erase(gameObjectList.begin() + 1);
+								printf("Game Over");
+								gameOver = true;
+							}
+							else
+							{
+								printf("Incorrect, don't get crushed now");
+							}
+						}
+					}
+					break;
+
+				case SDLK_6:
+					if (!gameOver) {
+						if (correctGuess == 6) {
+							// Set new target
+							correctGuess = rand() % 10;
+							// Move tank back
+							gameObjectList[0]->Move(btVector3(-1.0f, 0.0f, 0.0f));
+							// Increase score
+							playerScore += 1;
+							printf("Correct");
+						}
+						else
+						{
+							// Move tank forward
+							gameObjectList[0]->Move(btVector3(0.5f, 0.0f, 0.0f));
+							// Check tank is hitting car
+							if (gameObjectList[0]->m_rigidBody->getWorldTransform().getOrigin().getX() > 35.0f)
+							{
+								// Destroy car
+								dynamicsWorld->removeRigidBody(gameObjectList[1]->m_rigidBody);
+								gameObjectList[1]->Destroy();
+								// Remove array element
+								gameObjectList.erase(gameObjectList.begin() + 1);
+								printf("Game Over");
+								gameOver = true;
+							}
+							else
+							{
+								printf("Incorrect, don't get crushed now");
+							}
+						}
+					}
+					break;
+
+				case SDLK_7:
+					if (!gameOver) {
+						if (correctGuess == 7) {
+							// Set new target
+							correctGuess = rand() % 10;
+							// Move tank back
+							gameObjectList[0]->Move(btVector3(-1.0f, 0.0f, 0.0f));
+							// Increase score
+							playerScore += 1;
+							printf("Correct");
+						}
+						else
+						{
+							// Move tank forward
+							gameObjectList[0]->Move(btVector3(0.5f, 0.0f, 0.0f));
+							// Check tank is hitting car
+							if (gameObjectList[0]->m_rigidBody->getWorldTransform().getOrigin().getX() > 35.0f)
+							{
+								// Destroy car
+								dynamicsWorld->removeRigidBody(gameObjectList[1]->m_rigidBody);
+								gameObjectList[1]->Destroy();
+								// Remove array element
+								gameObjectList.erase(gameObjectList.begin() + 1);
+								printf("Game Over");
+								gameOver = true;
+							}
+							else
+							{
+								printf("Incorrect, don't get crushed now");
+							}
+						}
+					}
+					break;
+
+				case SDLK_8:
+					if (!gameOver) {
+						if (correctGuess == 8) {
+							// Set new target
+							correctGuess = rand() % 10;
+							// Move tank back
+							gameObjectList[0]->Move(btVector3(-1.0f, 0.0f, 0.0f));
+							// Increase score
+							playerScore += 1;
+							printf("Correct");
+						}
+						else
+						{
+							// Move tank forward
+							gameObjectList[0]->Move(btVector3(0.5f, 0.0f, 0.0f));
+							// Check tank is hitting car
+							if (gameObjectList[0]->m_rigidBody->getWorldTransform().getOrigin().getX() > 35.0f)
+							{
+								// Destroy car
+								dynamicsWorld->removeRigidBody(gameObjectList[1]->m_rigidBody);
+								gameObjectList[1]->Destroy();
+								// Remove array element
+								gameObjectList.erase(gameObjectList.begin() + 1);
+								printf("Game Over");
+								gameOver = true;
+							}
+							else
+							{
+								printf("Incorrect, don't get crushed now");
+							}
+						}
+					}
+					break;
+
+				case SDLK_9:
+					if (!gameOver) {
+						if (correctGuess == 9) {
+							// Set new target
+							correctGuess = rand() % 10;
+							// Move tank back
+							gameObjectList[0]->Move(btVector3(-1.0f, 0.0f, 0.0f));
+							// Increase score
+							playerScore += 1;
+							printf("Correct");
+						}
+						else
+						{
+							// Move tank forward
+							gameObjectList[0]->Move(btVector3(0.5f, 0.0f, 0.0f));
+							// Check tank is hitting car
+							if (gameObjectList[0]->m_rigidBody->getWorldTransform().getOrigin().getX() > 35.0f)
+							{
+								// Destroy car
+								dynamicsWorld->removeRigidBody(gameObjectList[1]->m_rigidBody);
+								gameObjectList[1]->Destroy();
+								// Remove array element
+								gameObjectList.erase(gameObjectList.begin() + 1);
+								printf("Game Over");
+								gameOver = true;
+							}
+							else
+							{
+								printf("Incorrect, don't get crushed now");
+							}
+						}
+					}
 					break;
 
 				default:

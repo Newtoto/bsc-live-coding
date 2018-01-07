@@ -25,6 +25,7 @@
 #include "Lighting.h"
 #include "Material.h"
 
+
 void LoadImageSupport();
 void RequestCoreOpenGL(int majVer, int minVer);
 

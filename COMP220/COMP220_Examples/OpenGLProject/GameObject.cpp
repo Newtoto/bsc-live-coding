@@ -138,3 +138,8 @@ void GameObject::Destroy()
 	}
 	m_meshes.clear();
 }
+
+void GameObject::Move(btVector3 movementAmount)
+{
+	m_rigidBody->translate(movementAmount);
+}

@@ -36,6 +36,7 @@ public:
 	void Render();
 	void Update();
 	void Destroy();
+	void Move(btVector3 movementAmount);
 
 	btRigidBody* m_rigidBody;
 

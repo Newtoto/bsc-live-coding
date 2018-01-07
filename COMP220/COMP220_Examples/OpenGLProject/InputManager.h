@@ -11,5 +11,5 @@ public:
 	InputManager();
 	~InputManager();
 
-	Input forward, sideways, jump, fly, mouseSensitivity;
+	Input forward, sideways, jump, fly, mouseSensitivity, keyboardSensitivity;
 };
