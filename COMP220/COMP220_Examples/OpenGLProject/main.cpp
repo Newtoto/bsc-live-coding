@@ -298,7 +298,7 @@ int main(int argc, char* args[])
 
 				case SDLK_b:
 					// Black and white post processing
-					postProcessingProgramID = LoadShaders("passThroughVert.glsl", "postBlackAndwhite.glsl");
+					postProcessingProgramID = LoadShaders("passThroughVert.glsl", "postSepiaTone.glsl");
 					break;
 
 				// Number inputs

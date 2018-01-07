@@ -94,5 +94,6 @@
     <None Include="postTextureFrag.glsl" />
     <None Include="passThroughVert.glsl" />
     <None Include="postBlackAndwhite.glsl" />
+    <None Include="postSepiaTone.glsl" />
   </ItemGroup>
 </Project>
