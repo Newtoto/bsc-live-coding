@@ -9,6 +9,7 @@ Left shift = fly down
 B = sepia tone post processing
 R = reset post processes
 Up/Down arrows = adjust mouse sensitivity
+T = Spawn another tank model in the air
 
 __The Game__
 A random number between 0 and 9 is set.
