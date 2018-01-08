@@ -7,9 +7,6 @@
 class InputManager
 {
 public:
-
-	InputManager();
-	~InputManager();
-
-	Input forward, sideways, jump, fly, mouseSensitivity, keyboardSensitivity;
+	// Create inputs
+	Input forward, sideways, jump, fly, mouseSensitivity;
 };
