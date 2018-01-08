@@ -28,14 +28,23 @@ public:
 	class GameObject();
 	~GameObject();
 
+	// Load mesh using fbx file
 	void LoadMeshesFromFile(const std::string& filename);
+	// Load texture using image file
 	void LoadDiffuseTextureFromFile(const std::string& filename);
+	// Load shaders from vertex and fragment glsl files
 	void LoadShaderProgram(const std::string& vertexShaderFilename, const std::string& fragmentShaderFilename);
+	// Create bullet physics rigid body
 	void CreateRigidBody();
+	// Create and assign uniform locations
 	void PreRender();
+	// Render meshes
 	void Render();
+	// Update location using rigid body or position
 	void Update();
+	// Delete rigid body and mesh pointers
 	void Destroy();
+	// Use bulletphysics to move object by a btVector3
 	void Move(btVector3 movementAmount);
 
 	btRigidBody* m_rigidBody;
