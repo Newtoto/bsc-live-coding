@@ -247,6 +247,7 @@ int main(int argc, char* args[])
 
 					pObject->CreateRigidBody();
 					dynamicsWorld->addRigidBody(pObject->m_rigidBody);
+					break;
 				case SDLK_UP:
 					// Start increasing mouse sensitivity
 					inputs.mouseSensitivity.SetPositive();
