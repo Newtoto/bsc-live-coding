@@ -88,22 +88,31 @@ int main(int argc, char* args[])
 	// Create game object list
 	std::vector<GameObject*> gameObjectList;
 
-	// Create tank
+	// Create gameobject pointer
 	GameObject * pObject = new GameObject();
+	// Set tank location and rotation
 	pObject->SetPosition(vec3(0.0f, 0.0f, 0.0f));
 	pObject->SetRotation(vec3(0.0f, 3.1f, 0.0f));
+	// Create tank mesh from fbx
 	pObject->LoadMeshesFromFile("Tank1.FBX");
+	// Get tank texture from image file
 	pObject->LoadDiffuseTextureFromFile("Tank1DF.png");
+	// Create shader program for tank
 	pObject->LoadShaderProgram("lightingVert.glsl", "lightingFrag.glsl");
+	// Add tank to gameObjectList vector
 	gameObjectList.push_back(pObject);
 
-	// Create car
+	// Reassign gameobject pointer for car
 	pObject = new GameObject();
+	// Set car position
 	pObject->SetPosition(vec3(40.0f, 0.0f, 0.0f));
-	//pObject->SetRotation(vec3(0.0f, 0.0f, 0.0f));
+	// Get car mesh from fbx
 	pObject->LoadMeshesFromFile("armoredrecon.fbx");
+	// Get car texture from image file
 	pObject->LoadDiffuseTextureFromFile("armoredrecon_diff.png");
+	// Create shader program for car
 	pObject->LoadShaderProgram("lightingVert.glsl", "lightingFrag.glsl");
+	// Add car to gameObjectList vector
 	gameObjectList.push_back(pObject);
 
 	// Add camera
@@ -244,16 +253,25 @@ int main(int argc, char* args[])
 				switch (event.key.keysym.sym)
 				{
 				case SDLK_t:
+					// Reassign gameobject pointer to default GameObject
 					pObject = new GameObject();
+					// Set position of new object
 					pObject->SetPosition(vec3(10.0f, 40.0f, 0.0f));
+					// Set mesh of new object to tank fbx
 					pObject->LoadMeshesFromFile("Tank1.FBX");
+					// Set texture of new tank with image file
 					pObject->LoadDiffuseTextureFromFile("Tank1DF.png");
+					// Load shader for new tank object
 					pObject->LoadShaderProgram("textureVert.glsl", "textureFrag.glsl");
+					// Add tank to gameObjectList vector
 					gameObjectList.push_back(pObject);
 
+					// Create rigidbody for new tank
 					pObject->CreateRigidBody();
+					// Add new tank rigidbody to dynamicsWorld
 					dynamicsWorld->addRigidBody(pObject->m_rigidBody);
 					break;
+
 				case SDLK_UP:
 					// Start increasing mouse sensitivity
 					inputs.mouseSensitivity.SetPositive();
