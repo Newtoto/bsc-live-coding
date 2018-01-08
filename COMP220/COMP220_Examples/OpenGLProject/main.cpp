@@ -157,7 +157,13 @@ int main(int argc, char* args[])
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	GLuint postProcessingProgramID = LoadShaders("passThroughVert.glsl", "postTextureFrag.glsl");
+	// Load post processing IDs
+	GLuint passThroughPostProcessing = LoadShaders("passThroughVert.glsl", "postTextureFrag.glsl");
+	GLuint sepiaTonePostProcessing = LoadShaders("passThroughVert.glsl", "postSepiaTone.glsl");
+
+	// Set current post processing ID to pass through
+	GLuint postProcessingProgramID = passThroughPostProcessing;
+
 	GLint texture0Location = glGetUniformLocation(postProcessingProgramID, "texture0");
 	if (texture0Location < 0)
 	{
@@ -294,12 +300,12 @@ int main(int argc, char* args[])
 
 				case SDLK_r:
 					// Reset post processing
-					postProcessingProgramID = LoadShaders("passThroughVert.glsl", "postTextureFrag.glsl");
+					postProcessingProgramID = passThroughPostProcessing;
 					break;
 
 				case SDLK_b:
 					// Black and white post processing
-					postProcessingProgramID = LoadShaders("passThroughVert.glsl", "postSepiaTone.glsl");
+					postProcessingProgramID = sepiaTonePostProcessing;
 					break;
 
 				// Number inputs
